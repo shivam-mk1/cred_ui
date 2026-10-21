@@ -1,0 +1,111 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/di/injection.dart';
+import '../../../../core/utils/cta_dispatcher.dart';
+import '../../../../domain/entities/section_entity.dart';
+import '../cubit/card_management_cubit.dart';
+import '../cubit/card_management_state.dart';
+import '../widgets/card/card_face_widget.dart';
+import '../widgets/card/card_pose.dart';
+import '../widgets/card/cred_card_deck_animator.dart';
+import '../widgets/detail_panel/card_detail_panel.dart';
+import '../widgets/shared/tab_toggle_widget.dart';
+import '../widgets/states/error_state_widget.dart';
+import '../widgets/states/loading_state_widget.dart';
+import '../widgets/templates/template_registry.dart';
+
+class CardAnimationScreen extends StatelessWidget {
+  const CardAnimationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<CardManagementCubit>()..load(),
+      child: const _CardAnimationView(),
+    );
+  }
+}
+
+class _CardAnimationView extends StatelessWidget {
+  const _CardAnimationView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF2F1EC), // AppColors.screenBg
+      body: SafeArea(
+        child: BlocBuilder<CardManagementCubit, CardManagementState>(
+          builder: (context, state) {
+            return switch (state.status) {
+              CardManagementStatus.initial ||
+              CardManagementStatus.loading =>
+                const LoadingStateWidget(),
+              CardManagementStatus.error => ErrorStateWidget(
+                  message: state.errorMessage ?? 'Failed to load card data',
+                  onRetry: () => context.read<CardManagementCubit>().load(),
+                ),
+              CardManagementStatus.loaded => _buildLoaded(context, state),
+            };
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoaded(BuildContext context, CardManagementState state) {
+    final cubit = context.read<CardManagementCubit>();
+    final ctaDispatcher = sl<CtaDispatcher>();
+
+    // ── Template registry for server-driven header sections ──────────────────
+    final registry = TemplateRegistry(
+      ctaDispatcher: ctaDispatcher,
+      activeToggle: state.activeToggle,
+      topBarCenterWidget: TabToggleWidget(
+        active: state.activeToggle,
+        dueCount: 1,
+        onToggle: (toggle) => cubit.setActiveToggle(toggle),
+      ),
+    );
+
+    // ── Fixed header: top bar + statement info ────────────────────────────────
+    final Widget header = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final section in state.sections)
+          if (section is TopBarSection || section is StatementInfoSection)
+            registry.build(context, section),
+      ],
+    );
+
+    // ── Card widgets — passed verbatim; CredCardDeckAnimator never modifies them
+    final List<Widget> cardWidgets = state.cards.map((section) {
+      return CardFaceWidget(
+        card: section.body,
+        pose: CardPose.identity,
+        showStatementOverlay: true,
+        showPill: true,
+      );
+    }).toList();
+    final selectedCard = state.cards.isEmpty
+        ? null
+        : state.cards[state.selectedCardIndex.clamp(0, state.cards.length - 1)];
+
+    return CredCardDeckAnimator(
+      cardSpacing: 16.0,
+      stackPeekHeight: 38.0,
+
+      // ── Your existing card widgets — passed directly, untouched ─────────────
+      cards: cardWidgets,
+
+      // ── Fixed header pinned above the animated card area ────────────────────
+      header: header,
+
+      // ── Details sheet content (your existing CardDetailPanel) ───────────────
+      detailsSheet: selectedCard != null
+          ? CardDetailPanel(card: selectedCard.body)
+          : null,
+    );
+  }
+}

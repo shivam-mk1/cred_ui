@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'core/di/injection.dart';
 import 'core/theme/app_colors.dart';
-import 'presentation/card_management/screen/card_management_screen.dart';
+import 'presentation/card_management/screen/card_animation_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class CredApp extends StatelessWidget {
         ),
         fontFamily: 'Roboto',
       ),
-      home: const CardManagementScreen(),
+      home: const CardAnimationScreen(),
     );
   }
 }
