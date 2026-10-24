@@ -50,7 +50,6 @@ app.*.map.json
 # miscellaneous
 assessment_details
 .vscode
-test/
 web/
 .metadata
 analysis_options.yaml

@@ -1,0 +1,602 @@
+{
+    "items": [
+        {
+            "external_id": "section_048de397-b08f-4c57-ad7e-f32b1ef5ec93:048de397-b08f-4c57-ad7e-f32b1ef5ec93",
+            "entity_type": "section",
+            "template_name": "cm_top_bar",
+            "template_properties": {
+                "body": {
+                    "cta_2": {
+                        "deeplink": {
+                            "url": ""
+                        },
+                        "type": "deeplink",
+                        "asset": {
+                            "type": "image",
+                            "url": "https://assets.dreamplug.in/octapaul/heartbeat/a170fe5083de11ef852e31eafd837164.png"
+                        }
+                    },
+                    "template_type": "cm_top_bar",
+                    "cta_1": {
+                        "type": "flow",
+                        "asset": {
+                            "type": "image",
+                            "url": "https://assets.dreamplug.in/octapaul/heartbeat/83190c9083de11ef82f3c772f21cc8f4.png"
+                        },
+                        "title": "<format>₹9,67,340</format>"
+                    },
+                    "cta_3": {
+                        "deeplink": {
+                            "url": ""
+                        },
+                        "type": "deeplink",
+                        "asset": {
+                            "type": "image",
+                            "url": "https://assets.dreamplug.in/octapaul/heartbeat/ca90a47083de11ef852e31eafd837164.png"
+                        }
+                    }
+                },
+                "child_list": []
+            }
+        },
+        {
+            "external_id": "section_9f7d43cb-912c-4f22-aa4b-43ec393d4057:9f7d43cb-912c-4f22-aa4b-43ec393d4057",
+            "entity_type": "section",
+            "template_name": "unbilled_statement_info_section_v2",
+            "template_properties": {
+                "body": {
+                    "statement": {
+                        "amount": 50000.0,
+                        "text_1": "STATEMENT DUE FOR 1 CARD",
+                        "text_3": "TOTAL DUE",
+                        "due_count": 1,
+                        "text_2": "₹50,000.00",
+                        "cta_2": {
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "Pay bill"
+                        },
+                        "cta_1": {
+                            "type": "flow",
+                            "flow": {
+                                "type": "unbilled_statement_info_dialog"
+                            }
+                        }
+                    },
+                    "cta_2": {
+                        "deeplink": {
+                            "url": ""
+                        },
+                        "type": "deeplink",
+                        "asset": {
+                            "type": "image",
+                            "url": "https://assets.dreamplug.in/octapaul/heartbeat/16807f501c9911f1a286213feab0a487.png"
+                        }
+                    },
+                    "template_type": "unbilled_statement_info_section_v2",
+                    "unbilled": {
+                        "amount": 0.0,
+                        "text_1": "RECENT SPENDS",
+                        "text_3": "RECENT SPENDS",
+                        "text_2": "₹0.00",
+                        "cta_2": {
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "View transactions"
+                        }
+                    },
+                    "cta_1": {
+                        "deeplink": {
+                            "url": ""
+                        },
+                        "type": "deeplink",
+                        "asset": {
+                            "type": "image",
+                            "url": "https://assets.dreamplug.in/octapaul/heartbeat/1b6e66301c9911f1a286213feab0a487.png"
+                        }
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://assets.dreamplug.in/octapaul/heartbeat/cd437f201da811f1a9b1e5989777e21c.png"
+                    }
+                },
+                "child_list": [
+                    {
+                        "external_id": "card_65474860-207b-41db-bad6-798c06373a0d:65474860-207b-41db-bad6-798c06373a0d",
+                        "entity_type": "card",
+                        "template_name": "unbilled_statement_info_section_offer_2",
+                        "template_properties": {
+                            "body": {
+                                "asset": {
+                                    "type": "image",
+                                    "url": "https://assets.credcdn.in/proddocs/prod-rewards-assets-data/e27c6f87-4a55-407b-9b5c-f001d0541c0f.png"
+                                },
+                                "template_type": "unbilled_statement_info_section_offer_2",
+                                "flipper_config": [
+                                    {
+                                        "cta": {
+                                            "deeplink": {
+                                                "url": ""
+                                            },
+                                            "type": "deeplink"
+                                        },
+                                        "should_show_timer": false,
+                                        "text_1": "<format><text fgClr=\"#6A3C6A\">get ₹50 cashback on full bill payments</text></format>"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "external_id": "section_51ce11a7-997e-4eb2-848c-702e330a868a:51ce11a7-997e-4eb2-848c-702e330a868a",
+            "entity_type": "section",
+            "template_name": "cm_card_instrument",
+            "template_properties": {
+                "tracking_data": {
+                    "user_action_tracking_enabled": false,
+                    "tag_click": false,
+                    "tag_load": false
+                },
+                "card_live_activity": {
+                    "should_scale": false
+                },
+                "body": {
+                    "show_alert": false,
+                    "is_light": false,
+                    "flipper_pill": [
+                        {
+                            "priority": 7,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>2 pending actions</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                },
+                                "asset": {
+                                    "type": "image",
+                                    "url": "https://d1fo9cu1se6ydy.cloudfront.net/input/9fdaca72-fc9a-4b36-999f-c096a40a8bed.png"
+                                }
+                            },
+                            "type": "pending_action"
+                        },
+                        {
+                            "priority": 1,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>View details</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                }
+                            },
+                            "type": "view_details"
+                        }
+                    ],
+                    "rupay_supported": false,
+                    "provider": "",
+                    "is_cred_card": false,
+                    "statement": {
+                        "text_1": "₹50,000.00",
+                        "asset_4": {
+                            "type": "image",
+                            "url": ""
+                        },
+                        "text_2": "DUE ON 18 SEP",
+                        "cta_1": {
+                            "label_color": "",
+                            "label_text": "",
+                            "label_asset": {
+                                "type": "image",
+                                "url": ""
+                            },
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "cta_type": "light_flat",
+                            "type": "deeplink",
+                            "title": "Pay now"
+                        }
+                    },
+                    "text_3": "•• 1234",
+                    "tap_and_pay_supported": false,
+                    "asset_3": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/AXIS%20BANK%20MINI%20CARD.png"
+                    },
+                    "text_5": "",
+                    "template_type": "cm_card_instrument",
+                    "text_4": "Lorem Ipsum",
+                    "asset_2": {
+                        "type": "image",
+                        "url": ""
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/AXIS%20BANK%20CARD%20BACKGROUND.png"
+                    },
+                    "alert_color": ""
+                },
+                "child_list": []
+            }
+        },
+        {
+            "template_name": "cm_card_instrument",
+            "template_properties": {
+                "body": {
+                    "show_alert": false,
+                    "is_light": false,
+                    "flipper_pill": [
+                        {
+                            "priority": 7,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>2 pending actions</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                },
+                                "asset": {
+                                    "type": "image",
+                                    "url": "https://d1fo9cu1se6ydy.cloudfront.net/input/9fdaca72-fc9a-4b36-999f-c096a40a8bed.png"
+                                }
+                            },
+                            "type": "pending_action"
+                        },
+                        {
+                            "priority": 1,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>View details</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                }
+                            },
+                            "type": "view_details"
+                        }
+                    ],
+                    "instrument_id": "8998f825-8620-4e48-b292-855eafb653ac",
+                    "rupay_supported": false,
+                    "provider": "",
+                    "is_cred_card": false,
+                    "statement": {
+                        "text_2": "",
+                        "cta_1": {
+                            "label_color": "",
+                            "label_text": "",
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "cta_type": "light_flat",
+                            "label_asset": {
+                                "type": "image",
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "Pay now"
+                        }
+                    },
+                    "text_3": "•• 7722",
+                    "tap_and_pay_supported": false,
+                    "asset_3": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/YES%20BANK%20MINI%20CARD.png"
+                    },
+                    "text_5": "",
+                    "template_type": "cm_card_instrument",
+                    "text_4": "Lorem Ipsum",
+                    "asset_2": {
+                        "type": "image",
+                        "url": ""
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/YES%20BANK%20CARD%20BACKGROUND.png"
+                    },
+                    "alert_color": ""
+                },
+                "child_list": []
+            }
+        },
+        {
+            "template_name": "cm_card_instrument",
+            "template_properties": {
+                "body": {
+                    "show_alert": false,
+                    "is_light": false,
+                    "instrument_id": "bb4f10c0-17c4-40bd-b866-49f609d54f0c",
+                    "rupay_supported": false,
+                    "provider": "",
+                    "is_cred_card": false,
+                    "statement": {
+                        "text_2": "",
+                        "cta_1": {
+                            "label_color": "",
+                            "label_text": "",
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "cta_type": "light_flat",
+                            "label_asset": {
+                                "type": "image",
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "Pay now"
+                        }
+                    },
+                    "text_3": "•• 5501",
+                    "tap_and_pay_supported": false,
+                    "asset_3": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/HDFC%20BANK%20MINI%20CARD.png"
+                    },
+                    "text_5": "",
+                    "template_type": "cm_card_instrument",
+                    "text_4": "Lorem Ipsum",
+                    "asset_2": {
+                        "type": "image",
+                        "url": ""
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/HDFC%20BANK%20CARD%20BACKGROUND.png"
+                    },
+                    "alert_color": ""
+                },
+                "child_list": []
+            }
+        },
+        {
+            "template_name": "cm_card_instrument",
+            "template_properties": {
+                "body": {
+                    "show_alert": false,
+                    "is_light": false,
+                    "flipper_pill": [
+                        {
+                            "priority": 7,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>2 pending actions</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                },
+                                "asset": {
+                                    "type": "image",
+                                    "url": "https://d1fo9cu1se6ydy.cloudfront.net/input/9fdaca72-fc9a-4b36-999f-c096a40a8bed.png"
+                                }
+                            },
+                            "type": "pending_action"
+                        },
+                        {
+                            "priority": 1,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>View details</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                }
+                            },
+                            "type": "view_details"
+                        }
+                    ],
+                    "instrument_id": "26d4bc63-c3dd-4b79-bdfe-c22f38b725f0",
+                    "rupay_supported": false,
+                    "provider": "",
+                    "is_cred_card": false,
+                    "statement": {
+                        "text_2": "",
+                        "cta_1": {
+                            "label_color": "",
+                            "label_text": "",
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "cta_type": "light_flat",
+                            "label_asset": {
+                                "type": "image",
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "Pay now"
+                        }
+                    },
+                    "text_3": "•• 0925",
+                    "tap_and_pay_supported": false,
+                    "asset_3": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/IDFC%20FIRST%20BANK%20MINI%20CARD.png"
+                    },
+                    "text_5": "",
+                    "template_type": "cm_card_instrument",
+                    "text_4": "Lorem Ipsum",
+                    "asset_2": {
+                        "type": "image",
+                        "url": ""
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/IDFC%20FIRST%20BANK%20CARD%20BACKGROUND.png"
+                    },
+                    "alert_color": ""
+                },
+                "child_list": []
+            }
+        },
+        {
+            "template_name": "cm_card_instrument",
+            "template_properties": {
+                "card_live_activity": {
+                    "should_scale": false
+                },
+                "body": {
+                    "show_alert": false,
+                    "is_light": false,
+                    "flipper_pill": [
+                        {
+                            "priority": 7,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>2 pending actions</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                },
+                                "asset": {
+                                    "type": "image",
+                                    "url": "https://d1fo9cu1se6ydy.cloudfront.net/input/9fdaca72-fc9a-4b36-999f-c096a40a8bed.png"
+                                }
+                            },
+                            "type": "pending_action"
+                        },
+                        {
+                            "priority": 1,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>View details</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                }
+                            },
+                            "type": "view_details"
+                        }
+                    ],
+                    "instrument_id": "f0503e74-5275-452e-8b69-2859bacef237",
+                    "rupay_supported": false,
+                    "provider": "",
+                    "is_cred_card": false,
+                    "statement": {
+                        "text_2": "",
+                        "cta_1": {
+                            "label_color": "",
+                            "label_text": "",
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "cta_type": "light_flat",
+                            "label_asset": {
+                                "type": "image",
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "Pay now"
+                        }
+                    },
+                    "text_3": "•• 0373",
+                    "tap_and_pay_supported": false,
+                    "asset_3": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/SBI%20MINI%20CARD.png"
+                    },
+                    "text_5": "",
+                    "template_type": "cm_card_instrument",
+                    "text_4": "Lorem Ipsum",
+                    "asset_2": {
+                        "type": "image",
+                        "url": ""
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/SBI%20CARD%20BACKGROUND.png"
+                    },
+                    "alert_color": ""
+                },
+                "child_list": []
+            }
+        },
+        {
+            "template_name": "cm_card_instrument",
+            "template_properties": {
+                "card_live_activity": {
+                    "should_scale": false
+                },
+                "body": {
+                    "show_alert": false,
+                    "is_light": false,
+                    "flipper_pill": [
+                        {
+                            "priority": 7,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>3 pending actions</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                },
+                                "asset": {
+                                    "type": "image",
+                                    "url": "https://d1fo9cu1se6ydy.cloudfront.net/input/9fdaca72-fc9a-4b36-999f-c096a40a8bed.png"
+                                }
+                            },
+                            "type": "pending_action"
+                        },
+                        {
+                            "priority": 1,
+                            "duration": 1000,
+                            "cta_1": {
+                                "title": "<format>View details</format>",
+                                "type": "deeplink",
+                                "deeplink": {
+                                    "url": ""
+                                }
+                            },
+                            "type": "view_details"
+                        }
+                    ],
+                    "instrument_id": "358559c7-473a-44a0-91b2-8626622debbc",
+                    "rupay_supported": true,
+                    "provider": "RUPAY",
+                    "is_cred_card": false,
+                    "statement": {
+                        "text_2": "",
+                        "cta_1": {
+                            "label_color": "",
+                            "label_text": "",
+                            "deeplink": {
+                                "url": ""
+                            },
+                            "cta_type": "light_flat",
+                            "label_asset": {
+                                "type": "image",
+                                "url": ""
+                            },
+                            "type": "deeplink",
+                            "title": "Pay now"
+                        }
+                    },
+                    "text_3": "•• 6385",
+                    "tap_and_pay_supported": false,
+                    "asset_3": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/IDFC%20FIRST%20BANK%20MINI%20CARD.png"
+                    },
+                    "text_5": "",
+                    "template_type": "cm_card_instrument",
+                    "text_4": "Lorem Ipsum",
+                    "asset_2": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/rupay_white.png"
+                    },
+                    "asset_1": {
+                        "type": "image",
+                        "url": "https://d1sofudel0ufia.cloudfront.net/mesh/card-art/IDFC%20FIRST%20BANK%20CARD%20BACKGROUND.png"
+                    },
+                    "alert_color": ""
+                },
+                "child_list": []
+            }
+        }
+    ]
+}

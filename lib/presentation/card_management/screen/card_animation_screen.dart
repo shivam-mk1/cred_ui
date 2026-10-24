@@ -17,10 +17,18 @@ import '../widgets/states/loading_state_widget.dart';
 import '../widgets/templates/template_registry.dart';
 
 class CardAnimationScreen extends StatelessWidget {
-  const CardAnimationScreen({super.key});
+  const CardAnimationScreen({super.key, this.cubit});
+
+  final CardManagementCubit? cubit;
 
   @override
   Widget build(BuildContext context) {
+    if (cubit != null) {
+      return BlocProvider.value(
+        value: cubit!,
+        child: const _CardAnimationView(),
+      );
+    }
     return BlocProvider(
       create: (_) => sl<CardManagementCubit>()..load(),
       child: const _CardAnimationView(),
@@ -39,11 +47,23 @@ class _CardAnimationView extends StatelessWidget {
         child: BlocBuilder<CardManagementCubit, CardManagementState>(
           builder: (context, state) {
             return switch (state.status) {
-              CardManagementStatus.initial ||
-              CardManagementStatus.loading =>
-                const LoadingStateWidget(),
+              CardManagementStatus.initial => const LoadingStateWidget(),
+              CardManagementStatus.loading => state.failure != null
+                  ? ErrorStateWidget(
+                      message: state.failure?.message ??
+                          state.errorMessage ??
+                          'Failed to load card data',
+                      failure: state.failure,
+                      isLoading: true,
+                      onRetry: () => context.read<CardManagementCubit>().load(),
+                    )
+                  : const LoadingStateWidget(),
               CardManagementStatus.error => ErrorStateWidget(
-                  message: state.errorMessage ?? 'Failed to load card data',
+                  message: state.failure?.message ??
+                      state.errorMessage ??
+                      'Failed to load card data',
+                  failure: state.failure,
+                  isLoading: false,
                   onRetry: () => context.read<CardManagementCubit>().load(),
                 ),
               CardManagementStatus.loaded => _buildLoaded(context, state),

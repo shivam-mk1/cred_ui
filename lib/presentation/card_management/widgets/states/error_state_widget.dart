@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-/// Error state widget with message and retry CTA.
+/// Error state widget with typed failure support and disabled state during in-flight requests.
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     super.key,
     required this.message,
     required this.onRetry,
+    this.failure,
+    this.isLoading = false,
   });
 
   final String message;
   final VoidCallback onRetry;
+  final AppFailure? failure;
+  final bool isLoading;
+
+  IconData _getIcon() {
+    return switch (failure) {
+      NoInternetFailure() => Icons.wifi_off_rounded,
+      TimeoutFailure() => Icons.timer_outlined,
+      RateLimitFailure() => Icons.speed_rounded,
+      ServerFailure() => Icons.cloud_off_rounded,
+      _ => Icons.error_outline_rounded,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +36,9 @@ class ErrorStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline_rounded,
-              size: 48,
+            Icon(
+              _getIcon(),
+              size: 52,
               color: AppColors.error,
             ),
             const SizedBox(height: 16),
@@ -32,18 +47,29 @@ class ErrorStateWidget extends StatelessWidget {
               style: AppTextStyles.errorMessage,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: onRetry,
+              onPressed: isLoading ? null : onRetry,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.ctaBgDark,
                 foregroundColor: AppColors.ctaTextLight,
+                disabledBackgroundColor: AppColors.ctaBgDark.withValues(alpha: 0.5),
+                disabledForegroundColor: AppColors.ctaTextLight.withValues(alpha: 0.7),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
               ),
-              child: const Text('Retry'),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('Retry'),
             ),
           ],
         ),

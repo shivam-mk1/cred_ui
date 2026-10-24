@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failures.dart';
 import '../../../domain/entities/section_entity.dart';
 
 enum CardManagementStatus { initial, loading, loaded, error }
@@ -17,6 +18,7 @@ class CardManagementState extends Equatable {
     this.activeToggle = ActiveToggle.totalDue,
     this.isDetailPanelOpen = false,
     this.errorMessage,
+    this.failure,
   });
 
   final CardManagementStatus status;
@@ -32,6 +34,7 @@ class CardManagementState extends Equatable {
   final bool isDetailPanelOpen;
 
   final String? errorMessage;
+  final AppFailure? failure;
 
   CardInstrumentSection? get selectedCard => cards.isEmpty
       ? null
@@ -48,6 +51,7 @@ class CardManagementState extends Equatable {
     ActiveToggle? activeToggle,
     bool? isDetailPanelOpen,
     String? errorMessage,
+    AppFailure? failure,
     bool clearError = false,
   }) {
     return CardManagementState(
@@ -59,6 +63,7 @@ class CardManagementState extends Equatable {
       activeToggle: activeToggle ?? this.activeToggle,
       isDetailPanelOpen: isDetailPanelOpen ?? this.isDetailPanelOpen,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      failure: clearError ? null : (failure ?? this.failure),
     );
   }
 
@@ -72,5 +77,6 @@ class CardManagementState extends Equatable {
         activeToggle,
         isDetailPanelOpen,
         errorMessage,
+        failure,
       ];
 }

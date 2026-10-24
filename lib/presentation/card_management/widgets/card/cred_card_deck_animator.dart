@@ -552,6 +552,10 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
 
 /// A 2-column × 3-row grid of action chips that fills its parent's height
 /// using spaceEvenly — no fixed childAspectRatio, no clipping.
+///
+/// NOTE: The 6 quick-action chips below are client-side UI actions mandated by
+/// the CRED UI visual design specification. They are NOT currently driven by
+/// the server-driven UI (SDUI) API response contract.
 class _DefaultActionGrid extends StatelessWidget {
   static const _items = [
     (icon: Icons.check_circle_outline, label: 'mark as paid'),

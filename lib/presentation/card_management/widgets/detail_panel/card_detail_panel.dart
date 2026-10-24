@@ -42,7 +42,7 @@ class CardDetailPanel extends StatelessWidget {
             'pending actions')
         : 'no pending actions';
 
-    final dynamicDetailRows = [
+    final dynamicDetailRows = <DetailPanelRow>[
       DetailPanelRow(
         icon: Icons.description_outlined,
         title: 'latest statement',
@@ -55,21 +55,12 @@ class CardDetailPanel extends StatelessWidget {
             ? 'card number ${card.text3}'
             : 'active credit card',
       ),
-      DetailPanelRow(
-        icon: Icons.notification_important_outlined,
-        title: 'pending actions',
-        subtitle: pendingSubtitle,
-      ),
-      const DetailPanelRow(
-        icon: Icons.account_balance_wallet_outlined,
-        title: 'recent spends',
-        subtitle: 'no spends since last statement',
-      ),
-      const DetailPanelRow(
-        icon: Icons.local_offer_outlined,
-        title: 'card offers',
-        subtitle: 'verify card to unlock',
-      ),
+      if (pendingActionPill != null)
+        DetailPanelRow(
+          icon: Icons.notification_important_outlined,
+          title: 'pending actions',
+          subtitle: pendingSubtitle,
+        ),
     ];
 
     return SingleChildScrollView(
@@ -180,7 +171,7 @@ class CardDetailPanel extends StatelessWidget {
                       Text(
                         headerText.isNotEmpty
                             ? headerText
-                            : CardDetailStaticData.detailSectionDate,
+                            : 'CARD DETAILS',
                         style: AppTextStyles.detailSectionDate,
                       ),
                       const SizedBox(height: 8),

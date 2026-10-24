@@ -25,5 +25,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assessment_details/api_response.json

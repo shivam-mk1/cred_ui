@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../entities/section_entity.dart';
 import '../repositories/card_management_repository.dart';
 
@@ -6,5 +7,6 @@ class FetchCardManagementUseCase {
 
   final CardManagementRepository _repository;
 
-  Future<List<SectionEntity>> call() => _repository.fetchSections();
+  Future<List<SectionEntity>> call({CancelToken? cancelToken}) =>
+      _repository.fetchSections(cancelToken: cancelToken);
 }
