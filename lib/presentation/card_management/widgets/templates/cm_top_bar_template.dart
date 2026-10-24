@@ -9,7 +9,8 @@ import '../shared/server_image_widget.dart';
 
 /// Renders template `cm_top_bar`.
 /// Left: cta_2 (offers/rewards %)
-/// Center: custom [centerWidget] (e.g. TabToggleWidget) or cta_1 (wallet balance)
+/// Center: custom [centerWidget] (e.g. TabToggleWidget) or cta_1 (wallet
+/// balance)
 /// Right: cta_3 (settings gear)
 class CmTopBarTemplate extends StatelessWidget {
   const CmTopBarTemplate({

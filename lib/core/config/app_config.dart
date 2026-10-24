@@ -4,7 +4,8 @@
 abstract final class AppConfig {
   /// Base endpoint URL for fetching card management sections.
   ///
-  /// Override with: `--dart-define CARD_MANAGEMENT_URL=https://...`
+  /// Configured via `--dart-define` so CI pipelines, staging builds, and mock
+  /// servers can target alternate environments without modifying source code.
   static const String cardManagementUrl = String.fromEnvironment(
     'CARD_MANAGEMENT_URL',
     defaultValue: 'https://api.mocklets.com/p87/card-management',

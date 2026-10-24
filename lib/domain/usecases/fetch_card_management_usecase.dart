@@ -12,10 +12,12 @@ class FetchCardManagementUseCase {
 
   /// Fetches the top-level section hierarchy from the repository.
   ///
-  /// Returns a list of [SectionEntity] nodes representing parsed server templates.
-  /// Throws an [AppFailure] subtype if network, rate-limiting, or parsing fails.
+  /// Returns a list of [SectionEntity] nodes representing parsed server
+  /// templates. Throws an [AppFailure] subtype if network, rate-limiting,
+  /// or parsing fails.
   Future<List<SectionEntity>> call() => _repository.fetchSections();
 
-  /// Cancels all active in-flight requests initiated through this use case.
+  /// Cancels all in-flight requests on the shared repository instance,
+  /// including any initiated by other callers sharing this repository.
   void cancel() => _repository.cancel();
 }

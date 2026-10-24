@@ -8,8 +8,8 @@ import '../card/card_face_widget.dart';
 import '../card/card_pose.dart';
 import 'detail_row_widget.dart';
 
-/// Slide-up modal panel presenting detailed statement metadata, payment history,
-/// and security controls for the selected [card].
+/// Slide-up modal panel presenting detailed statement metadata, payment
+/// history, and security controls for the selected [card].
 class CardDetailPanel extends StatelessWidget {
   const CardDetailPanel({
     super.key,

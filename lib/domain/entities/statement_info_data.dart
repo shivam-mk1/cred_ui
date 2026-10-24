@@ -10,6 +10,9 @@ class StatementInfoData {
   final int dueCount; // statement.due_count (1)
   final String subtitle; // statement.text_1 ("STATEMENT DUE FOR 1 CARD")
   final String amount; // statement.text_2 ("₹50,000.00")
+  /// Call-to-action title (e.g. "Pay bill") or null if omitted by the API.
+  /// Null hides the button entirely to avoid misleading users when no action
+  /// is pending or required.
   final String? ctaTitle; // statement.cta_2.title ("Pay bill") or null if omitted
   final String unbilledTitle; // unbilled.text_3 ("RECENT SPENDS")
 

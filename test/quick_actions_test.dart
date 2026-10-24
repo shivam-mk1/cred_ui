@@ -31,7 +31,6 @@ void main() {
     );
   }
 
-  // Protects card drawer swipe gestures, chip layout wrap constraints, and tap collapse.
   group('CredCardDeckAnimator - Quick Action Chips Verification', () {
     testWidgets('renders all 6 quick action chips upon swiping card left', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);

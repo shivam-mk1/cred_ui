@@ -314,7 +314,7 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
     final double revealProgress =
         (_horizontalDragX.abs() / kMaxLeftSlide.abs()).clamp(0.0, 1.0);
 
-    // Wider than the raw swipe gap so items spread out and shift left naturally.
+    // Wider than raw swipe gap so items spread out and shift left naturally.
     final double panelWidth = kMaxLeftSlide.abs() + 40;
 
     return Positioned(
@@ -346,7 +346,8 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
     final List<Widget> widgets = [];
     final int count = widget.cards.length;
 
-    // Front card of the bottom deck (Card index 1) sits ~115px above viewport bottom
+    // Front card of the bottom deck (Card index 1) sits ~115px above viewport
+    // bottom.
     final double frontCardY = viewportHeight - 115.0;
 
     // Pre-calculate resting Deck coordinates and scales
@@ -364,17 +365,20 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
         deckY[i] = frontCardY;
         deckScale[i] = 1.0;
       } else if (i == 2) {
-        // Immediately behind Card 1: peeks 46px above Card 1 so header & logo are visible
+        // Immediately behind Card 1: peeks 46px above Card 1 so header and logo
+        // are visible.
         deckY[i] = frontCardY - 46.0;
         deckScale[i] = 0.94;
       } else {
-        // Cards further back peek an additional 22px higher each, with smaller scale
+        // Cards further back peek an additional 22px higher each, with smaller
+        // scale.
         deckY[i] = frontCardY - 46.0 - ((i - 2) * 22.0);
         deckScale[i] = math.max(0.80, 0.94 - ((i - 2) * 0.05));
       }
     }
 
-    // Paint from deepest bottom card (count - 1) down to Card 1, then Card 0 on top
+    // Paint from deepest bottom card (count - 1) down to Card 1, then Card 0
+    // on top.
     final List<int> paintOrder = [];
     for (int i = count - 1; i >= 1; i--) {
       paintOrder.add(i);
@@ -557,7 +561,8 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
 ///
 /// NOTE: The 6 quick-action chips below are client-side UI actions mandated by
 /// the CRED UI visual design specification. They are NOT currently driven by
-/// the server-driven UI (SDUI) API response contract.
+/// the server-driven UI (SDUI) API response contract, which provides no
+/// template for contextual card action grids.
 class _DefaultActionGrid extends StatelessWidget {
   static const _items = [
     (icon: Icons.check_circle_outline, label: 'mark as paid'),
@@ -628,7 +633,8 @@ class _ActionChip extends StatelessWidget {
           child: Icon(icon, size: 18, color: Colors.black87),
         ),
         const SizedBox(height: 5),
-        // Fixed width gives the text a bounded constraint so it wraps to 2 lines.
+        // Fixed width gives the text a bounded constraint so it wraps to 2
+        // lines.
         SizedBox(
           width: 56,
           child: Text(

@@ -4,8 +4,9 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 /// Configures and provides a configured [Dio] HTTP client instance.
 ///
-/// Applies 10-second connection and transmission limits to prevent hanging requests.
-/// Logging interceptors are strictly compiled out in production release builds.
+/// Applies 10-second connection and transmission limits to prevent hanging
+/// requests. Logging interceptors are strictly compiled out in production
+/// release builds.
 class DioClient {
   DioClient() {
     _dio = Dio(
@@ -16,7 +17,8 @@ class DioClient {
         headers: {'Accept': 'application/json'},
       ),
     );
-    // Logging is restricted to debug mode to prevent leaking payload data in release builds.
+    // Logging is restricted to debug mode to prevent leaking payload data in
+    // release builds.
     if (kDebugMode) {
       _dio.interceptors.add(
         PrettyDioLogger(requestBody: true, responseBody: true),

@@ -10,7 +10,6 @@ import 'package:cred_assignment/domain/entities/section_entity.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Protects domain entity parsing against unexpected schema changes in assessment payload.
   test('Parses mock JSON file into SDUI sections correctly', () async {
     final file = File('test/fixtures/api_response.json');
     final jsonStr = await file.readAsString();

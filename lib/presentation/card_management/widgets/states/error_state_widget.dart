@@ -3,7 +3,8 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-/// Error state widget with typed failure support and disabled state during in-flight requests.
+/// Error state widget with typed failure support and disabled state during
+/// in-flight requests.
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     super.key,
@@ -47,6 +48,8 @@ class ErrorStateWidget extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
+              // Retry is disabled while loading so rapid user taps cannot
+              // exhaust the Mocklets endpoint's strict 5-request rate limit.
               onPressed: isLoading ? null : onRetry,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.ctaBgDark,

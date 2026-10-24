@@ -18,7 +18,8 @@ import '../widgets/states/error_state_widget.dart';
 import '../widgets/states/loading_state_widget.dart';
 import '../widgets/templates/template_registry.dart';
 
-/// Top-level screen widget providing the [CardManagementCubit] and hosting the animated deck.
+/// Top-level screen widget providing the [CardManagementCubit] and hosting the
+/// animated deck.
 class CardAnimationScreen extends StatelessWidget {
   const CardAnimationScreen({super.key, this.cubit});
 
@@ -76,7 +77,7 @@ class _CardAnimationView extends StatelessWidget {
     final cubit = context.read<CardManagementCubit>();
     final ctaDispatcher = sl<CtaDispatcher>();
 
-    // ── Bind to unbilled_statement_info_section_v2 dynamically ────────────────
+    // ── Bind to unbilled_statement_info_section_v2 dynamically ──────────
     final statementSection =
         state.sections.whereType<StatementInfoSection>().firstOrNull;
     final statementData = statementSection != null

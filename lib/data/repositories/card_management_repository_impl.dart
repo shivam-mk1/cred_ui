@@ -10,10 +10,12 @@ import '../../domain/entities/offer_banner_entity.dart';
 import '../../domain/repositories/card_management_repository.dart';
 import '../datasources/card_management_remote_datasource.dart';
 
-/// Implementation of [CardManagementRepository] managing networking and failure translation.
+/// Implementation of [CardManagementRepository] managing networking and failure
+/// translation.
 ///
-/// Pools cancellation tokens to enable fine-grained request lifecycles without leaking
-/// tokens across concurrent calls. Translates raw framework errors into typed [AppFailure]s.
+/// Pools cancellation tokens to enable fine-grained request lifecycles without
+/// leaking tokens across concurrent calls. Translates raw framework errors into
+/// typed [AppFailure]s.
 class CardManagementRepositoryImpl implements CardManagementRepository {
   CardManagementRepositoryImpl(this._datasource);
 
@@ -21,7 +23,8 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
   final Set<CancelToken> _activeTokens = <CancelToken>{};
   CancelToken? _lastToken;
 
-  /// Returns the most recently created or active cancellation token for testing.
+  /// Returns the most recently created or active cancellation token for
+  /// testing.
   @visibleForTesting
   CancelToken? get currentCancelToken => _activeTokens.lastOrNull ?? _lastToken;
 
@@ -31,6 +34,9 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
 
   @override
   Future<List<SectionEntity>> fetchSections() async {
+    // Each request gets an isolated token so concurrent fetches (e.g. quick
+    // retries or screen re-entry) can be cancelled individually without
+    // aborting sibling requests.
     final token = CancelToken();
     _lastToken = token;
     _activeTokens.add(token);
@@ -39,6 +45,8 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
       final raw = await _datasource.fetchRaw(cancelToken: token);
       final rawItems = raw['items'];
       if (rawItems == null || rawItems is! List) {
+        // Missing or non-list 'items' indicates a breaking API schema change;
+        // failing fast prevents masking corrupt server responses as empty.
         throw const ParseFailure('Missing or invalid "items" list in response.');
       }
       return rawItems
@@ -69,7 +77,8 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
       }
       throw const UnknownFailure();
     } finally {
-      // Clean up strictly this request's token; never touches sibling tokens.
+      // Clean up strictly this request's token; never touches sibling tokens
+      // belonging to concurrent requests.
       _activeTokens.remove(token);
     }
   }
@@ -86,6 +95,11 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
   }
 
   /// Maps low-level [DioException] instances into typed [AppFailure]s.
+  ///
+  /// `connectivity_plus` is intentionally omitted: network interface status
+  /// checks produce false positives (e.g. captive portals or dead Wi-Fi).
+  /// Instead, Dio's connection errors and socket failures directly verify
+  /// end-to-end endpoint reachability.
   AppFailure _mapDioException(DioException e) {
     if (e.type == DioExceptionType.cancel || CancelToken.isCancel(e)) {
       return const CancelledFailure();
@@ -149,6 +163,8 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
 
     final props = map['template_properties'];
     if (props == null || props is! Map) {
+      // Throw rather than defaulting to empty properties: missing template
+      // attributes would cause silently malformed or unrenderable UI sections.
       throw const ParseFailure('Missing or invalid "template_properties" in section.');
     }
     final propsMap = Map<String, dynamic>.from(props);

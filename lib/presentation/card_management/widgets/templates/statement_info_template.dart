@@ -49,7 +49,7 @@ class StatementInfoTemplate extends StatelessWidget {
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          // ── Celebratory background gift boxes/confetti asset ─────────────────
+          // ── Celebratory background gift boxes/confetti asset ────────
           if (statementInfo.asset1?.hasUrl == true)
             Positioned(
               top: -14,
@@ -65,7 +65,7 @@ class StatementInfoTemplate extends StatelessWidget {
               ),
             ),
 
-          // ── Main statement content ──────────────────────────────────────────
+          // ── Main statement content ──────────────────────────────────
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -118,7 +118,9 @@ class StatementInfoTemplate extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // "Pay bill" / "View transactions" black pill button
+              // Omit the CTA button if not provided by the API; showing a
+              // default label like "Pay bill" could mislead users when no bill
+              // is due.
               if (ctaButton?.title != null && ctaButton!.title!.isNotEmpty)
                 GestureDetector(
                   onTap: () => ctaDispatcher.dispatch(context, ctaButton),

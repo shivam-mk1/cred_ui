@@ -10,7 +10,8 @@ class FlipperPillEntity extends Equatable {
     this.cta1,
   });
 
-  /// Sorting priority for resolving badge display order (lower values render first).
+  /// Sorting priority for resolving badge display order (lower values render
+  /// first).
   final int priority;
 
   /// Display interval duration in milliseconds when cycling pills.

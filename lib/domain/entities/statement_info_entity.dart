@@ -79,7 +79,8 @@ class UnbilledSummaryEntity extends Equatable {
 
 /// Domain model for `unbilled_statement_info_section_v2`.
 ///
-/// Encapsulates celebratory background media along with both billed and unbilled summaries.
+/// Encapsulates celebratory background media along with both billed and
+/// unbilled summaries.
 class StatementInfoEntity extends Equatable {
   const StatementInfoEntity({
     this.statement,

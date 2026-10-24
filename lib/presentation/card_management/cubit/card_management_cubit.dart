@@ -10,7 +10,7 @@ import 'card_management_state.dart';
 /// State transitions:
 /// - Initial: [CardManagementStatus.initial]
 /// - Loading: [CardManagementStatus.loading] on initial fetch or user retry
-/// - Loaded: [CardManagementStatus.loaded] with parsed sections and card entities
+/// - Loaded: [CardManagementStatus.loaded] with parsed sections and cards
 /// - Error: [CardManagementStatus.error] containing a typed [AppFailure]
 class CardManagementCubit extends Cubit<CardManagementState> {
   CardManagementCubit(this._fetchUseCase)
@@ -21,16 +21,18 @@ class CardManagementCubit extends Cubit<CardManagementState> {
   /// Loads card management sections from the remote repository.
   ///
   /// Cancels any active in-flight request before triggering a fresh load to
-  /// prevent race conditions from rapid retry button taps.
-  /// Emits [CardManagementStatus.loading], followed by [CardManagementStatus.loaded]
+  /// prevent race conditions from rapid retry button taps. Emits
+  /// [CardManagementStatus.loading], followed by [CardManagementStatus.loaded]
   /// on success or [CardManagementStatus.error] on failure.
   Future<void> load() async {
-    // Abort prior in-flight request to prevent race conditions from rapid retries.
+    // Abort prior in-flight request to prevent race conditions from rapid
+    // retries.
     _fetchUseCase.cancel();
     emit(state.copyWith(status: CardManagementStatus.loading));
     try {
       final sections = await _fetchUseCase();
-      // Guard against emitting state if the cubit closed while the future was resolving.
+      // Guard against emitting state if the cubit closed while the future was
+      // resolving.
       if (isClosed) return;
       final cards = sections.whereType<CardInstrumentSection>().toList();
       emit(state.copyWith(
@@ -40,7 +42,8 @@ class CardManagementCubit extends Cubit<CardManagementState> {
         clearError: true,
       ));
     } on CancelledFailure {
-      // Intentional cancellation; leave state untouched so loading/current UI remains stable.
+      // An intentional abort (from a superseded retry or screen disposal) must
+      // not emit an error state; leaving state untouched avoids UI flicker.
       return;
     } on AppFailure catch (failure) {
       if (isClosed) return;
@@ -60,7 +63,8 @@ class CardManagementCubit extends Cubit<CardManagementState> {
     }
   }
 
-  /// Sets the currently active segmented tab toggle ([ActiveToggle.totalDue] or [ActiveToggle.recentSpends]).
+  /// Sets the currently active segmented tab toggle ([ActiveToggle.totalDue]
+  /// or [ActiveToggle.recentSpends]).
   void setActiveToggle(ActiveToggle toggle) {
     emit(state.copyWith(activeToggle: toggle));
   }

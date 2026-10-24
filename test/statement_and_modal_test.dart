@@ -13,7 +13,6 @@ import 'package:cred_assignment/presentation/card_management/cubit/card_manageme
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Protects detail sheet binding, bank name extraction fallbacks, and tab badge thresholds.
   group('StatementInfoData JSON parsing', () {
     test('parses StatementInfoData accurately from assessment api_response.json', () async {
       final file = File('test/fixtures/api_response.json');

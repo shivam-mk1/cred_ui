@@ -84,8 +84,8 @@ class CardInstrumentEntity extends Equatable {
   /// Sorted by priority ascending on parse
   final List<FlipperPillEntity> flipperPill;
 
-  /// Extracts bank name from mini-card asset url (e.g. "AXIS BANK MINI CARD.png" -> "AXIS BANK")
-  /// or falls back to provider / credit card.
+  /// Extracts bank name from mini-card asset url (e.g. "AXIS BANK MINI
+  /// CARD.png" -> "AXIS BANK") or falls back to provider / credit card.
   String get bankName {
     if (asset3?.url != null && asset3!.url!.isNotEmpty) {
       final uri = Uri.tryParse(asset3!.url!);

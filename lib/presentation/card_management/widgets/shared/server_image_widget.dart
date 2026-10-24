@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-/// Loads and caches remote network images with graceful null and error handling.
+/// Loads and caches remote network images with graceful null and error
+/// handling.
 class ServerImageWidget extends StatelessWidget {
   const ServerImageWidget({
     super.key,

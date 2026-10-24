@@ -9,6 +9,7 @@ abstract final class CardManagementConstants {
   /// Default label for the recent spends tab toggle when omitted by the server.
   static const String recentSpendsLabel = 'RECENT SPENDS';
 
-  /// Fallback header title for the detail sheet when card statement date is absent.
+  /// Fallback header title for the detail sheet when card statement date is
+  /// absent.
   static const String cardDetailsFallbackTitle = 'CARD DETAILS';
 }

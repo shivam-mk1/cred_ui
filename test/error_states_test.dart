@@ -83,7 +83,6 @@ void main() {
     );
   }
 
-  // Protects typed error UI presentation, retry button disablement, and unhandled cancel exceptions.
   group('Error & Offline State Verification (Requirement 8)', () {
     testWidgets('renders NoInternet UI and no card data when offline', (tester) async {
       await tester.pumpWidget(buildScreenWithFailure(const NoInternetFailure()));
@@ -213,7 +212,8 @@ void main() {
       await cubit.close();
       expect(cubit.isClosed, isTrue);
 
-      // Complete future after close: guarded emit must return safely without throwing
+      // Complete future after close: guarded emit must return safely without
+      // throwing.
       completer.complete([]);
       await expectLater(loadFuture, completes);
 

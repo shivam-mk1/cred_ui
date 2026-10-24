@@ -5,9 +5,11 @@ abstract interface class CardManagementRepository {
   /// Fetches top-level section templates from the data layer.
   ///
   /// Returns a list of parsed [SectionEntity] items.
-  /// Throws an [AppFailure] subtype if networking, rate-limiting, or parsing fails.
+  /// Throws an [AppFailure] subtype if networking, rate-limiting, or parsing
+  /// fails.
   Future<List<SectionEntity>> fetchSections();
 
-  /// Cancels all currently in-flight section fetch operations.
+  /// Cancels all in-flight requests across all consumers sharing this
+  /// repository singleton instance.
   void cancel();
 }
