@@ -307,6 +307,70 @@ void main() {
       expect(secondFetchResult, isEmpty);
     });
 
+    test('starts two fetches without awaiting first: cancelling first leaves second intact to succeed', () async {
+      final dio = Dio();
+      int callIndex = 0;
+
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) async {
+            callIndex++;
+            final currentCall = callIndex;
+            // Introduce small delay to ensure both requests are in flight
+            await Future<void>.delayed(const Duration(milliseconds: 30));
+            if (options.cancelToken?.isCancelled == true) {
+              return handler.reject(
+                DioException(
+                  requestOptions: options,
+                  type: DioExceptionType.cancel,
+                ),
+              );
+            }
+            return handler.resolve(Response(
+              requestOptions: options,
+              data: {
+                'items': [
+                  {
+                    'template_name': 'cm_top_bar',
+                    'template_properties': {'body': {'id': currentCall}}
+                  }
+                ]
+              },
+              statusCode: 200,
+            ));
+          },
+        ),
+      );
+
+      final datasource = CardManagementRemoteDatasource(dio);
+      final repository = CardManagementRepositoryImpl(datasource);
+
+      // Start two fetches without awaiting the first
+      final fetch1 = repository.fetchSections();
+      final token1 = repository.currentCancelToken;
+
+      final fetch2 = repository.fetchSections();
+      final token2 = repository.currentCancelToken;
+
+      expect(token1, isNotNull);
+      expect(token2, isNotNull);
+      expect(token1, isNot(same(token2)));
+      expect(repository.activeTokens.length, 2);
+
+      // Cancel only the first request's token
+      token1!.cancel('Cancelled request 1');
+
+      // Assert first request throws CancelledFailure
+      await expectLater(fetch1, throwsA(isA<CancelledFailure>()));
+
+      // Assert second request succeeds intact
+      final result2 = await fetch2;
+      expect(result2.length, 1);
+      expect(token2!.isCancelled, isFalse);
+      // Assert tokens cleaned themselves up
+      expect(repository.activeTokens, isEmpty);
+    });
+
     test('cubit.close() cancels token; subsequent fetch on singleton repository creates new uncancelled token and succeeds', () async {
       final testSl = GetIt.asNewInstance();
       final dio = Dio();

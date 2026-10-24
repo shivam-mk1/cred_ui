@@ -16,6 +16,7 @@ class CardManagementCubit extends Cubit<CardManagementState> {
     emit(state.copyWith(status: CardManagementStatus.loading));
     try {
       final sections = await _fetchUseCase();
+      if (isClosed) return;
       final cards = sections.whereType<CardInstrumentSection>().toList();
       emit(state.copyWith(
         status: CardManagementStatus.loaded,
@@ -24,9 +25,9 @@ class CardManagementCubit extends Cubit<CardManagementState> {
         clearError: true,
       ));
     } on CancelledFailure {
-      // Request was cancelled; emit NO error state
       return;
     } on AppFailure catch (failure) {
+      if (isClosed) return;
       emit(state.copyWith(
         status: CardManagementStatus.error,
         failure: failure,
@@ -35,6 +36,7 @@ class CardManagementCubit extends Cubit<CardManagementState> {
       if (kDebugMode) {
         debugPrint('[CardManagementCubit] Unhandled error: ${e.runtimeType}');
       }
+      if (isClosed) return;
       emit(state.copyWith(
         status: CardManagementStatus.error,
         failure: const UnknownFailure(),

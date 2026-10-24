@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cred_assignment/core/error/failures.dart';
@@ -29,6 +30,18 @@ class _CancellingRepository implements CardManagementRepository {
   Future<List<SectionEntity>> fetchSections() async {
     throw const CancelledFailure();
   }
+
+  @override
+  void cancel() {}
+}
+
+class _DeferredRepository implements CardManagementRepository {
+  _DeferredRepository(this.future);
+
+  final Future<List<SectionEntity>> future;
+
+  @override
+  Future<List<SectionEntity>> fetchSections() => future;
 
   @override
   void cancel() {}
@@ -183,6 +196,34 @@ void main() {
       expect(cubit.state.status, CardManagementStatus.loaded);
       expect(repository.callCount, 2);
       expect(repository.firstCancelled, true);
+    });
+
+    test('closes the cubit mid-request without throwing StateError on success or error', () async {
+      final completer = Completer<List<SectionEntity>>();
+      final repository = _DeferredRepository(completer.future);
+      final useCase = FetchCardManagementUseCase(repository);
+      final cubit = CardManagementCubit(useCase);
+
+      // Start load (waiting on completer)
+      final loadFuture = cubit.load();
+      expect(cubit.state.status, CardManagementStatus.loading);
+
+      // Close cubit mid-request
+      await cubit.close();
+      expect(cubit.isClosed, isTrue);
+
+      // Complete future after close: guarded emit must return safely without throwing
+      completer.complete([]);
+      await expectLater(loadFuture, completes);
+
+      // Test with error completion when closed
+      final completerError = Completer<List<SectionEntity>>();
+      final cubitError = CardManagementCubit(FetchCardManagementUseCase(_DeferredRepository(completerError.future)));
+      final errorLoadFuture = cubitError.load();
+      await cubitError.close();
+
+      completerError.completeError(const ServerFailure());
+      await expectLater(errorLoadFuture, completes);
     });
   });
 }

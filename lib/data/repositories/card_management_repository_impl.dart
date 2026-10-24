@@ -14,16 +14,20 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
   CardManagementRepositoryImpl(this._datasource);
 
   final CardManagementRemoteDatasource _datasource;
-  CancelToken? _cancelToken;
+  final Set<CancelToken> _activeTokens = <CancelToken>{};
+  CancelToken? _lastToken;
 
   @visibleForTesting
-  CancelToken? get currentCancelToken => _cancelToken;
+  CancelToken? get currentCancelToken => _activeTokens.lastOrNull ?? _lastToken;
+
+  @visibleForTesting
+  Set<CancelToken> get activeTokens => Set.unmodifiable(_activeTokens);
 
   @override
   Future<List<SectionEntity>> fetchSections() async {
-    _cancelToken?.cancel();
     final token = CancelToken();
-    _cancelToken = token;
+    _lastToken = token;
+    _activeTokens.add(token);
 
     try {
       final raw = await _datasource.fetchRaw(cancelToken: token);
@@ -58,12 +62,20 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
         debugPrint('[CardManagementRepository] Unhandled error: ${e.runtimeType}');
       }
       throw const UnknownFailure();
+    } finally {
+      _activeTokens.remove(token);
     }
   }
 
   @override
   void cancel() {
-    _cancelToken?.cancel();
+    for (final token in _activeTokens) {
+      if (!token.isCancelled) {
+        token.cancel();
+      }
+    }
+    _activeTokens.clear();
+    _lastToken?.cancel();
   }
 
   AppFailure _mapDioException(DioException e) {
