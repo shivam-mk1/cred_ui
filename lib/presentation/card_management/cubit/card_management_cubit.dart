@@ -30,7 +30,6 @@ class CardManagementCubit extends Cubit<CardManagementState> {
       emit(state.copyWith(
         status: CardManagementStatus.error,
         failure: failure,
-        errorMessage: failure.message,
       ));
     } catch (e) {
       if (kDebugMode) {
@@ -39,7 +38,6 @@ class CardManagementCubit extends Cubit<CardManagementState> {
       emit(state.copyWith(
         status: CardManagementStatus.error,
         failure: const UnknownFailure(),
-        errorMessage: const UnknownFailure().message,
       ));
     }
   }

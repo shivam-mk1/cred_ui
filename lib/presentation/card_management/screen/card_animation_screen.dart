@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/di/injection.dart';
-import '../../../../core/utils/cta_dispatcher.dart';
-import '../../../../domain/entities/section_entity.dart';
-import '../../../../domain/entities/statement_info_data.dart';
+import '../../../core/constants/card_management_constants.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/error/failures.dart';
+import '../../../core/utils/cta_dispatcher.dart';
+import '../../../domain/entities/section_entity.dart';
+import '../../../domain/entities/statement_info_data.dart';
 import '../cubit/card_management_cubit.dart';
 import '../cubit/card_management_state.dart';
 import '../widgets/card/card_face_widget.dart';
@@ -12,6 +13,7 @@ import '../widgets/card/card_pose.dart';
 import '../widgets/card/cred_card_deck_animator.dart';
 import '../widgets/detail_panel/card_detail_panel.dart';
 import '../widgets/shared/tab_toggle_widget.dart';
+import '../widgets/states/empty_state_widget.dart';
 import '../widgets/states/error_state_widget.dart';
 import '../widgets/states/loading_state_widget.dart';
 import '../widgets/templates/template_registry.dart';
@@ -50,19 +52,13 @@ class _CardAnimationView extends StatelessWidget {
               CardManagementStatus.initial => const LoadingStateWidget(),
               CardManagementStatus.loading => state.failure != null
                   ? ErrorStateWidget(
-                      message: state.failure?.message ??
-                          state.errorMessage ??
-                          'Failed to load card data',
-                      failure: state.failure,
+                      failure: state.failure!,
                       isLoading: true,
                       onRetry: () => context.read<CardManagementCubit>().load(),
                     )
                   : const LoadingStateWidget(),
               CardManagementStatus.error => ErrorStateWidget(
-                  message: state.failure?.message ??
-                      state.errorMessage ??
-                      'Failed to load card data',
-                  failure: state.failure,
+                  failure: state.failure ?? const UnknownFailure(),
                   isLoading: false,
                   onRetry: () => context.read<CardManagementCubit>().load(),
                 ),
@@ -91,8 +87,10 @@ class _CardAnimationView extends StatelessWidget {
       topBarCenterWidget: TabToggleWidget(
         active: state.activeToggle,
         dueCount: statementData?.dueCount ?? 0,
-        totalDueLabel: statementData?.title ?? 'TOTAL DUE',
-        recentSpendsLabel: statementData?.unbilledTitle ?? 'RECENT SPENDS',
+        totalDueLabel:
+            statementData?.title ?? CardManagementConstants.totalDueLabel,
+        recentSpendsLabel: statementData?.unbilledTitle ??
+            CardManagementConstants.recentSpendsLabel,
         onToggle: (toggle) => cubit.setActiveToggle(toggle),
       ),
     );
@@ -106,6 +104,19 @@ class _CardAnimationView extends StatelessWidget {
             registry.build(context, section),
       ],
     );
+
+    if (state.cards.isEmpty) {
+      return Column(
+        children: [
+          header,
+          const Expanded(
+            child: EmptyStateWidget(
+              message: 'No cards available',
+            ),
+          ),
+        ],
+      );
+    }
 
     final List<Widget> cardWidgets = state.cards.map((section) {
       return CardFaceWidget(

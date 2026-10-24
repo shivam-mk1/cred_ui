@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/card_management_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../domain/entities/card_instrument_entity.dart';
-import '../../local_models/card_detail_static_data.dart';
+import '../../models/detail_panel_row.dart';
 import '../card/card_face_widget.dart';
 import '../card/card_pose.dart';
 import 'detail_row_widget.dart';
@@ -171,7 +172,7 @@ class CardDetailPanel extends StatelessWidget {
                       Text(
                         headerText.isNotEmpty
                             ? headerText
-                            : 'CARD DETAILS',
+                            : CardManagementConstants.cardDetailsFallbackTitle,
                         style: AppTextStyles.detailSectionDate,
                       ),
                       const SizedBox(height: 8),

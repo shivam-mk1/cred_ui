@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 class CardManagementRemoteDatasource {
   const CardManagementRemoteDatasource(this._dio);
 
   final Dio _dio;
 
-  static const _url = 'https://api.mocklets.com/p87/card-management';
-
   Future<Map<String, dynamic>> fetchRaw({CancelToken? cancelToken}) async {
     final response = await _dio.get<dynamic>(
-      _url,
+      AppConfig.cardManagementUrl,
       cancelToken: cancelToken,
     );
     final data = response.data;

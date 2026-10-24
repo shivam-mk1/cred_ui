@@ -1,3 +1,4 @@
+import '../../core/constants/card_management_constants.dart';
 import 'statement_info_entity.dart';
 
 class StatementInfoData {
@@ -5,7 +6,7 @@ class StatementInfoData {
   final int dueCount; // statement.due_count (1)
   final String subtitle; // statement.text_1 ("STATEMENT DUE FOR 1 CARD")
   final String amount; // statement.text_2 ("₹50,000.00")
-  final String ctaTitle; // statement.cta_2.title ("Pay bill")
+  final String? ctaTitle; // statement.cta_2.title ("Pay bill") or null if omitted
   final String unbilledTitle; // unbilled.text_3 ("RECENT SPENDS")
 
   StatementInfoData({
@@ -13,7 +14,7 @@ class StatementInfoData {
     required this.dueCount,
     required this.subtitle,
     required this.amount,
-    required this.ctaTitle,
+    this.ctaTitle,
     required this.unbilledTitle,
   });
 
@@ -23,23 +24,23 @@ class StatementInfoData {
     final unbilled = body['unbilled'] ?? {};
 
     return StatementInfoData(
-      title: statement['text_3'] ?? 'TOTAL DUE',
+      title: statement['text_3'] ?? CardManagementConstants.totalDueLabel,
       dueCount: statement['due_count'] ?? 0,
       subtitle: statement['text_1'] ?? '',
       amount: statement['text_2'] ?? '',
-      ctaTitle: statement['cta_2']?['title'] ?? 'Pay bill',
-      unbilledTitle: unbilled['text_3'] ?? 'RECENT SPENDS',
+      ctaTitle: statement['cta_2']?['title'] as String?,
+      unbilledTitle: unbilled['text_3'] ?? CardManagementConstants.recentSpendsLabel,
     );
   }
 
   factory StatementInfoData.fromEntity(StatementInfoEntity entity) {
     return StatementInfoData(
-      title: entity.statement?.text3 ?? 'TOTAL DUE',
+      title: entity.statement?.text3 ?? CardManagementConstants.totalDueLabel,
       dueCount: entity.statement?.dueCount ?? 0,
       subtitle: entity.statement?.text1 ?? '',
       amount: entity.statement?.text2 ?? '',
-      ctaTitle: entity.statement?.cta2?.title ?? 'Pay bill',
-      unbilledTitle: entity.unbilled?.text3 ?? 'RECENT SPENDS',
+      ctaTitle: entity.statement?.cta2?.title,
+      unbilledTitle: entity.unbilled?.text3 ?? CardManagementConstants.recentSpendsLabel,
     );
   }
 }

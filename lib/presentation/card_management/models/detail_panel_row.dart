@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Presentation model for detail panel rows.
+/// Presentation model for card detail panel rows.
 class DetailPanelRow {
   const DetailPanelRow({
     required this.icon,

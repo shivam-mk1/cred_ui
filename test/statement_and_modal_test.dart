@@ -40,7 +40,7 @@ void main() {
       expect(data.dueCount, 0);
       expect(data.subtitle, '');
       expect(data.amount, '');
-      expect(data.ctaTitle, 'Pay bill');
+      expect(data.ctaTitle, isNull);
       expect(data.unbilledTitle, 'RECENT SPENDS');
     });
   });

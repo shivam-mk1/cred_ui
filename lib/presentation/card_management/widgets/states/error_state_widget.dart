@@ -7,15 +7,13 @@ import '../../../../core/theme/app_text_styles.dart';
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     super.key,
-    required this.message,
+    required this.failure,
     required this.onRetry,
-    this.failure,
     this.isLoading = false,
   });
 
-  final String message;
+  final AppFailure failure;
   final VoidCallback onRetry;
-  final AppFailure? failure;
   final bool isLoading;
 
   IconData _getIcon() {
@@ -43,7 +41,7 @@ class ErrorStateWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              message,
+              failure.message,
               style: AppTextStyles.errorMessage,
               textAlign: TextAlign.center,
             ),

@@ -16,6 +16,9 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
   final CardManagementRemoteDatasource _datasource;
   CancelToken? _cancelToken;
 
+  @visibleForTesting
+  CancelToken? get currentCancelToken => _cancelToken;
+
   @override
   Future<List<SectionEntity>> fetchSections() async {
     _cancelToken?.cancel();
@@ -24,9 +27,17 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
 
     try {
       final raw = await _datasource.fetchRaw(cancelToken: token);
-      final items = raw['items'] as List<dynamic>? ?? [];
-      return items
-          .map((e) => _parseSection(e as Map<String, dynamic>? ?? {}))
+      final rawItems = raw['items'];
+      if (rawItems == null || rawItems is! List) {
+        throw const ParseFailure('Missing or invalid "items" list in response.');
+      }
+      return rawItems
+          .map((e) {
+            if (e is! Map) {
+              throw const ParseFailure('Section element is not a valid JSON map.');
+            }
+            return _parseSection(Map<String, dynamic>.from(e));
+          })
           .toList();
     } on DioException catch (e) {
       throw _mapDioException(e);
@@ -34,12 +45,12 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
       if (kDebugMode) {
         debugPrint('[CardManagementRepository] FormatException: ${e.message}');
       }
-      throw const ParseFailure();
+      throw const ParseFailure('Malformed JSON response payload.');
     } on TypeError catch (e) {
       if (kDebugMode) {
         debugPrint('[CardManagementRepository] TypeError: $e');
       }
-      throw const ParseFailure();
+      throw const ParseFailure('Type mismatch during JSON parsing.');
     } on AppFailure {
       rethrow;
     } catch (e) {
@@ -108,32 +119,54 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
   }
 
   SectionEntity _parseSection(Map<String, dynamic> map) {
-    final templateName = (map['template_name'] as String?) ?? '';
+    final templateName = map['template_name'];
+    if (templateName == null || templateName is! String) {
+      throw const ParseFailure('Missing or invalid "template_name" in section.');
+    }
     final externalId = map['external_id'] as String?;
-    final props = map['template_properties'] as Map<String, dynamic>? ?? {};
-    final body = props['body'] as Map<String, dynamic>? ?? {};
-    final rawChildList = props['child_list'] as List<dynamic>? ?? [];
-    final childList = rawChildList
-        .map((e) => _parseSection(e as Map<String, dynamic>? ?? {}))
-        .toList();
+
+    final props = map['template_properties'];
+    if (props == null || props is! Map) {
+      throw const ParseFailure('Missing or invalid "template_properties" in section.');
+    }
+    final propsMap = Map<String, dynamic>.from(props);
+
+    final body = propsMap['body'];
+    if (body != null && body is! Map) {
+      throw const ParseFailure('Invalid "body" structure in template_properties.');
+    }
+    final bodyMap = body is Map ? Map<String, dynamic>.from(body) : <String, dynamic>{};
+
+    final rawChildList = propsMap['child_list'];
+    if (propsMap.containsKey('child_list') && rawChildList is! List) {
+      throw const ParseFailure('Invalid "child_list" structure in section.');
+    }
+    final childList = rawChildList is List
+        ? rawChildList.map((e) {
+            if (e is! Map) {
+              throw const ParseFailure('Child section element is not a valid JSON map.');
+            }
+            return _parseSection(Map<String, dynamic>.from(e));
+          }).toList()
+        : <SectionEntity>[];
 
     return switch (templateName) {
       'cm_top_bar' => TopBarSection(
           externalId: externalId,
-          body: TopBarEntity.fromMap(body),
+          body: TopBarEntity.fromMap(bodyMap),
         ),
       'unbilled_statement_info_section_v2' => StatementInfoSection(
           externalId: externalId,
-          body: StatementInfoEntity.fromMap(body),
+          body: StatementInfoEntity.fromMap(bodyMap),
           childList: childList,
         ),
       'cm_card_instrument' => CardInstrumentSection(
           externalId: externalId,
-          body: CardInstrumentEntity.fromMap(body),
+          body: CardInstrumentEntity.fromMap(bodyMap),
         ),
       'unbilled_statement_info_section_offer_2' => OfferBannerSection(
           externalId: externalId,
-          body: OfferBannerEntity.fromMap(body),
+          body: OfferBannerEntity.fromMap(bodyMap),
         ),
       _ => UnknownSection(templateName),
     };

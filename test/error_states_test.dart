@@ -130,7 +130,7 @@ void main() {
       final widget = MaterialApp(
         home: Scaffold(
           body: ErrorStateWidget(
-            message: 'Failed to load',
+            failure: const ServerFailure(),
             isLoading: true,
             onRetry: () {},
           ),
@@ -164,7 +164,6 @@ void main() {
       // State must not transition to error
       expect(cubit.state.status, isNot(CardManagementStatus.error));
       expect(cubit.state.failure, isNull);
-      expect(cubit.state.errorMessage, isNull);
     });
 
     test('two load() calls in quick succession end in success, never stuck on loading', () async {

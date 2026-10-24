@@ -12,7 +12,6 @@ class CardManagementState extends Equatable {
     this.sections = const [],
     this.cards = const [],
     this.activeToggle = ActiveToggle.totalDue,
-    this.errorMessage,
     this.failure,
   });
 
@@ -20,7 +19,6 @@ class CardManagementState extends Equatable {
   final List<SectionEntity> sections;
   final List<CardInstrumentSection> cards;
   final ActiveToggle activeToggle;
-  final String? errorMessage;
   final AppFailure? failure;
 
   factory CardManagementState.initial() => const CardManagementState();
@@ -30,7 +28,6 @@ class CardManagementState extends Equatable {
     List<SectionEntity>? sections,
     List<CardInstrumentSection>? cards,
     ActiveToggle? activeToggle,
-    String? errorMessage,
     AppFailure? failure,
     bool clearError = false,
   }) {
@@ -39,7 +36,6 @@ class CardManagementState extends Equatable {
       sections: sections ?? this.sections,
       cards: cards ?? this.cards,
       activeToggle: activeToggle ?? this.activeToggle,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       failure: clearError ? null : (failure ?? this.failure),
     );
   }
@@ -50,7 +46,6 @@ class CardManagementState extends Equatable {
         sections,
         cards,
         activeToggle,
-        errorMessage,
         failure,
       ];
 }
