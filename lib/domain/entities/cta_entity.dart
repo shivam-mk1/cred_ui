@@ -1,8 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'asset_entity.dart';
 
+/// Categorizes the interaction mechanism for a call-to-action button or icon.
 enum CtaType { deeplink, flow, unknown }
 
+/// Encapsulates server-driven workflow identifiers (e.g., info dialogs).
 class FlowEntity extends Equatable {
   const FlowEntity({this.type});
 
@@ -17,6 +19,7 @@ class FlowEntity extends Equatable {
   List<Object?> get props => [type];
 }
 
+/// Encapsulates URI deeplink endpoints for navigation.
 class DeeplinkEntity extends Equatable {
   const DeeplinkEntity({this.url});
 
@@ -33,6 +36,7 @@ class DeeplinkEntity extends Equatable {
   List<Object?> get props => [url];
 }
 
+/// Domain entity representing a server-configured interactive action.
 class CtaEntity extends Equatable {
   const CtaEntity({
     required this.type,

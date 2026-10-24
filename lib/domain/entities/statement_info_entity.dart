@@ -5,6 +5,7 @@ import 'statement_info_data.dart';
 
 export 'statement_info_data.dart';
 
+/// Domain model for statement summary details (total due amount and actions).
 class StatementSummaryEntity extends Equatable {
   const StatementSummaryEntity({
     this.amount,
@@ -45,6 +46,7 @@ class StatementSummaryEntity extends Equatable {
       [amount, text1, text2, text3, dueCount, cta1, cta2, asset4];
 }
 
+/// Domain model for unbilled card activity summaries.
 class UnbilledSummaryEntity extends Equatable {
   const UnbilledSummaryEntity({
     this.amount,
@@ -75,6 +77,9 @@ class UnbilledSummaryEntity extends Equatable {
   List<Object?> get props => [amount, text1, text2, text3, cta2];
 }
 
+/// Domain model for `unbilled_statement_info_section_v2`.
+///
+/// Encapsulates celebratory background media along with both billed and unbilled summaries.
 class StatementInfoEntity extends Equatable {
   const StatementInfoEntity({
     this.statement,

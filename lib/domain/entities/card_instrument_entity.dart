@@ -3,6 +3,7 @@ import 'cta_entity.dart';
 import 'asset_entity.dart';
 import 'flipper_pill_entity.dart';
 
+/// Statement due information associated with an individual payment card.
 class CardStatementEntity extends Equatable {
   const CardStatementEntity({
     this.text1,
@@ -30,6 +31,7 @@ class CardStatementEntity extends Equatable {
   List<Object?> get props => [text1, text2, cta1, asset4];
 }
 
+/// Domain entity representing a user card instrument from `cm_card_instrument`.
 class CardInstrumentEntity extends Equatable {
   const CardInstrumentEntity({
     this.instrumentId,

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'cta_entity.dart';
 
+/// Presentation pill badge displayed across the top face of a card.
 class FlipperPillEntity extends Equatable {
   const FlipperPillEntity({
     required this.priority,
@@ -9,8 +10,12 @@ class FlipperPillEntity extends Equatable {
     this.cta1,
   });
 
+  /// Sorting priority for resolving badge display order (lower values render first).
   final int priority;
+
+  /// Display interval duration in milliseconds when cycling pills.
   final int duration;
+
   final String? type; // "pending_action"
   final CtaEntity? cta1;
 

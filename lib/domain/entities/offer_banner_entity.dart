@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'asset_entity.dart';
 import 'flipper_config_entity.dart';
 
+/// Domain entity representing the `unbilled_statement_info_section_offer_2` template.
 class OfferBannerEntity extends Equatable {
   const OfferBannerEntity({this.asset, this.flipperConfig = const []});
 

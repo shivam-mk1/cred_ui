@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'cta_entity.dart';
 
+/// Configuration for individual slides within an offer flipper widget.
 class FlipperConfigEntity extends Equatable {
   const FlipperConfigEntity({
     this.text1,

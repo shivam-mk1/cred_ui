@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'cta_entity.dart';
 
+/// Domain entity representing top app bar actions and navigation icons.
 class TopBarEntity extends Equatable {
   const TopBarEntity({this.cta1, this.cta2, this.cta3});
 

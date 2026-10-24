@@ -1,6 +1,10 @@
 import '../../core/constants/card_management_constants.dart';
 import 'statement_info_entity.dart';
 
+/// Presentation view adapter extracting consolidated statement fields.
+///
+/// Flattens nested statement and unbilled properties from [StatementInfoEntity]
+/// to simplify binding in tab toggles and summary headers.
 class StatementInfoData {
   final String title; // statement.text_3 ("TOTAL DUE")
   final int dueCount; // statement.due_count (1)
