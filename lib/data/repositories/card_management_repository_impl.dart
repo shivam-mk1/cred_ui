@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../core/error/failures.dart';
 import '../../domain/entities/section_entity.dart';
 import '../../domain/entities/top_bar_entity.dart';
@@ -23,14 +24,26 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
           .map((e) => _parseSection(e as Map<String, dynamic>? ?? {}))
           .toList();
     } on DioException catch (e) {
+      if (e.type == DioExceptionType.cancel || CancelToken.isCancel(e)) {
+        rethrow;
+      }
       throw _mapDioException(e);
     } on FormatException catch (e) {
-      throw ParseFailure('Data format error: ${e.message}');
+      if (kDebugMode) {
+        debugPrint('[CardManagementRepository] FormatException: ${e.message}');
+      }
+      throw const ParseFailure();
     } on TypeError catch (e) {
-      throw ParseFailure('Data schema mismatch: $e');
+      if (kDebugMode) {
+        debugPrint('[CardManagementRepository] TypeError: $e');
+      }
+      throw const ParseFailure();
     } on AppFailure {
       rethrow;
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[CardManagementRepository] Unhandled error: ${e.runtimeType}');
+      }
       throw const UnknownFailure();
     }
   }
@@ -59,10 +72,16 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
         if (statusCode != null && statusCode >= 500) {
           return const ServerFailure();
         }
-        return UnknownFailure('Server returned HTTP $statusCode');
+        if (kDebugMode) {
+          debugPrint('[CardManagementRepository] HTTP client error: $statusCode');
+        }
+        return const UnknownFailure();
       case DioExceptionType.cancel:
         return const UnknownFailure('Request was cancelled');
       case DioExceptionType.badCertificate:
+        if (kDebugMode) {
+          debugPrint('[CardManagementRepository] Bad certificate error');
+        }
         return const UnknownFailure('Security certificate verification failed');
       case DioExceptionType.unknown:
         if (e.error is SocketException ||
@@ -70,7 +89,10 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
                 e.error.toString().toLowerCase().contains('socket'))) {
           return const NoInternetFailure();
         }
-        return UnknownFailure(e.message ?? 'An unexpected error occurred');
+        if (kDebugMode) {
+          debugPrint('[CardManagementRepository] Unknown error: ${e.error?.runtimeType}');
+        }
+        return const UnknownFailure();
     }
   }
 

@@ -25,12 +25,6 @@ abstract final class AppTextStyles {
     letterSpacing: -0.5,
   );
 
-  static const TextStyle statementAmountSmall = TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.w300,
-    color: AppColors.textPrimary,
-  );
-
   // Tab toggle
   static const TextStyle tabActive = TextStyle(
     fontSize: 11,
@@ -60,13 +54,6 @@ abstract final class AppTextStyles {
   );
 
   // Card face
-  static const TextStyle cardBankName = TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w700,
-    color: AppColors.textOnDark,
-    letterSpacing: 0.3,
-  );
-
   static const TextStyle cardLastFour = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
@@ -105,19 +92,6 @@ abstract final class AppTextStyles {
     fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.offerBannerText,
-  );
-
-  // List card row
-  static const TextStyle listCardBank = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textOnDark,
-  );
-
-  static const TextStyle listCardSub = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textOnDarkSecondary,
   );
 
   // Detail panel

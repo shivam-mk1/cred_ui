@@ -140,13 +140,76 @@ void main() {
       );
     });
 
-    test('maps cancel to UnknownFailure', () async {
+    test('maps badResponse with HTTP 401 Unauthorized to UnknownFailure', () async {
       await assertMapping(
         errorToThrow: DioException(
           requestOptions: requestOptions,
-          type: DioExceptionType.cancel,
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: requestOptions,
+            statusCode: 401,
+            statusMessage: 'Unauthorized',
+          ),
         ),
         expectedFailureType: UnknownFailure,
+      );
+    });
+
+    test('maps badResponse with HTTP 403 Forbidden to UnknownFailure', () async {
+      await assertMapping(
+        errorToThrow: DioException(
+          requestOptions: requestOptions,
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: requestOptions,
+            statusCode: 403,
+            statusMessage: 'Forbidden',
+          ),
+        ),
+        expectedFailureType: UnknownFailure,
+      );
+    });
+
+    test('maps badResponse with HTTP 404 Not Found to UnknownFailure', () async {
+      await assertMapping(
+        errorToThrow: DioException(
+          requestOptions: requestOptions,
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: requestOptions,
+            statusCode: 404,
+            statusMessage: 'Not Found',
+          ),
+        ),
+        expectedFailureType: UnknownFailure,
+      );
+    });
+
+    test('rethrows DioException directly when type is cancel', () async {
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: requestOptions,
+                type: DioExceptionType.cancel,
+              ),
+            );
+          },
+        ),
+      );
+
+      final datasource = CardManagementRemoteDatasource(dio);
+      final repository = CardManagementRepositoryImpl(datasource);
+
+      expect(
+        () => repository.fetchSections(),
+        throwsA(isA<DioException>().having(
+          (e) => e.type,
+          'type',
+          DioExceptionType.cancel,
+        )),
       );
     });
 

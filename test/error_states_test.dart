@@ -6,6 +6,7 @@ import 'package:cred_assignment/domain/entities/section_entity.dart';
 import 'package:cred_assignment/domain/repositories/card_management_repository.dart';
 import 'package:cred_assignment/domain/usecases/fetch_card_management_usecase.dart';
 import 'package:cred_assignment/presentation/card_management/cubit/card_management_cubit.dart';
+import 'package:cred_assignment/presentation/card_management/cubit/card_management_state.dart';
 import 'package:cred_assignment/presentation/card_management/screen/card_animation_screen.dart';
 import 'package:cred_assignment/presentation/card_management/widgets/card/card_face_widget.dart';
 import 'package:cred_assignment/presentation/card_management/widgets/states/error_state_widget.dart';
@@ -18,6 +19,16 @@ class _FailingRepository implements CardManagementRepository {
   @override
   Future<List<SectionEntity>> fetchSections({CancelToken? cancelToken}) async {
     throw failure;
+  }
+}
+
+class _CancellingRepository implements CardManagementRepository {
+  @override
+  Future<List<SectionEntity>> fetchSections({CancelToken? cancelToken}) async {
+    throw DioException(
+      requestOptions: RequestOptions(path: 'https://api.mocklets.com/p87/card-management'),
+      type: DioExceptionType.cancel,
+    );
   }
 }
 
@@ -112,6 +123,22 @@ void main() {
       expect(button.onPressed, isNull);
       // Loading spinner shown
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    test('cubit emits no error state when request is cancelled via CancelToken', () async {
+      final repository = _CancellingRepository();
+      final useCase = FetchCardManagementUseCase(repository);
+      final cubit = CardManagementCubit(useCase);
+
+      expect(cubit.state.status, CardManagementStatus.initial);
+
+      // Trigger load which throws DioExceptionType.cancel
+      await cubit.load();
+
+      // State must not transition to error
+      expect(cubit.state.status, isNot(CardManagementStatus.error));
+      expect(cubit.state.failure, isNull);
+      expect(cubit.state.errorMessage, isNull);
     });
   });
 }

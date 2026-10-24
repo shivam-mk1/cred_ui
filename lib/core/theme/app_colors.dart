@@ -14,16 +14,13 @@ abstract final class AppColors {
   static const Color textOnDarkSecondary = Color(0xB3FFFFFF); // 70% white
 
   // Top bar
-  static const Color topBarBg = Color(0xFFF2F1EC);
   static const Color topBarAmountText = Color(0xFF1A1A1A);
 
   // Statement / Tab bar
   static const Color tabActive = Color(0xFF1A1A1A);
   static const Color tabInactive = Color(0xFF9B9B9B);
-  static const Color tabIndicator = Color(0xFFE53935); // red dot
 
   // Flipper pill
-  static const Color pillBg = Color(0xFFFFFFFF);
   static const Color pillText = Color(0xFF1A1A1A);
   static const Color pillAlertRed = Color(0xFFE53935);
 
@@ -33,12 +30,7 @@ abstract final class AppColors {
   static const Color ctaBgDark = Color(0xFF1A1A1A);
   static const Color ctaTextLight = Color(0xFFFFFFFF);
 
-  // Pay bill CTA (white pill on statement header)
-  static const Color payBillBg = Color(0xFFFFFFFF);
-  static const Color payBillText = Color(0xFF1A1A1A);
-
   // Offer banner
-  static const Color offerBannerBg = Color(0xFFFFF3F3);
   static const Color offerBannerText = Color(0xFF6A3C6A);
 
   // Detail panel

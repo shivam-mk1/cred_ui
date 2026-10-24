@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/error/failures.dart';
 import '../../../domain/entities/section_entity.dart';
@@ -26,7 +27,6 @@ class CardManagementCubit extends Cubit<CardManagementState> {
         status: CardManagementStatus.loaded,
         sections: sections,
         cards: cards,
-        selectedCardIndex: 0,
         clearError: true,
       ));
     } on AppFailure catch (failure) {
@@ -35,9 +35,21 @@ class CardManagementCubit extends Cubit<CardManagementState> {
         failure: failure,
         errorMessage: failure.message,
       ));
-    } catch (e) {
-      if (e is DioException && CancelToken.isCancel(e)) {
+    } on DioException catch (e) {
+      if (CancelToken.isCancel(e) || e.type == DioExceptionType.cancel) {
         return;
+      }
+      if (kDebugMode) {
+        debugPrint('[CardManagementCubit] Unhandled DioException: ${e.type}');
+      }
+      emit(state.copyWith(
+        status: CardManagementStatus.error,
+        failure: const UnknownFailure(),
+        errorMessage: const UnknownFailure().message,
+      ));
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[CardManagementCubit] Unhandled error: ${e.runtimeType}');
       }
       emit(state.copyWith(
         status: CardManagementStatus.error,
@@ -47,48 +59,13 @@ class CardManagementCubit extends Cubit<CardManagementState> {
     }
   }
 
-  @override
-  Future<void> close() {
-    _cancelToken?.cancel();
-    return super.close();
-  }
-
-  void selectCard(int index) {
-    if (index < 0 || index >= state.cards.length) return;
-    emit(state.copyWith(
-      selectedCardIndex: index,
-      layoutMode: CardLayoutMode.collapsedStack,
-      isDetailPanelOpen: false,
-    ));
-  }
-
-  void setLayoutMode(CardLayoutMode mode) {
-    emit(state.copyWith(layoutMode: mode, isDetailPanelOpen: false));
-  }
-
-  void openDetail() {
-    emit(state.copyWith(
-      layoutMode: CardLayoutMode.detail,
-      isDetailPanelOpen: false,
-    ));
-  }
-
-  void openDetailPanel() {
-    emit(state.copyWith(isDetailPanelOpen: true));
-  }
-
-  void closeDetailPanel() {
-    emit(state.copyWith(isDetailPanelOpen: false));
-  }
-
   void setActiveToggle(ActiveToggle toggle) {
     emit(state.copyWith(activeToggle: toggle));
   }
 
-  void collapseStack() {
-    emit(state.copyWith(
-      layoutMode: CardLayoutMode.collapsedStack,
-      isDetailPanelOpen: false,
-    ));
+  @override
+  Future<void> close() {
+    _cancelToken?.cancel();
+    return super.close();
   }
 }
