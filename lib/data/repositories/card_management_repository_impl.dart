@@ -10,6 +10,10 @@ import '../../domain/entities/offer_banner_entity.dart';
 import '../../domain/repositories/card_management_repository.dart';
 import '../datasources/card_management_remote_datasource.dart';
 
+/// Implementation of [CardManagementRepository] managing networking and failure translation.
+///
+/// Pools cancellation tokens to enable fine-grained request lifecycles without leaking
+/// tokens across concurrent calls. Translates raw framework errors into typed [AppFailure]s.
 class CardManagementRepositoryImpl implements CardManagementRepository {
   CardManagementRepositoryImpl(this._datasource);
 
@@ -17,9 +21,11 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
   final Set<CancelToken> _activeTokens = <CancelToken>{};
   CancelToken? _lastToken;
 
+  /// Returns the most recently created or active cancellation token for testing.
   @visibleForTesting
   CancelToken? get currentCancelToken => _activeTokens.lastOrNull ?? _lastToken;
 
+  /// Returns unmodifiable view of active in-flight request cancellation tokens.
   @visibleForTesting
   Set<CancelToken> get activeTokens => Set.unmodifiable(_activeTokens);
 
@@ -63,6 +69,7 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
       }
       throw const UnknownFailure();
     } finally {
+      // Clean up strictly this request's token; never touches sibling tokens.
       _activeTokens.remove(token);
     }
   }
@@ -78,6 +85,7 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
     _lastToken?.cancel();
   }
 
+  /// Maps low-level [DioException] instances into typed [AppFailure]s.
   AppFailure _mapDioException(DioException e) {
     if (e.type == DioExceptionType.cancel || CancelToken.isCancel(e)) {
       return const CancelledFailure();
@@ -118,6 +126,7 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
         }
         return const UnknownFailure('Security certificate verification failed');
       case DioExceptionType.unknown:
+        // Handle lower-level socket errors that Dio categorizes as unknown.
         if (e.error is SocketException ||
             (e.error != null &&
                 e.error.toString().toLowerCase().contains('socket'))) {
@@ -130,6 +139,7 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
     }
   }
 
+  /// Recursively parses a section map into a strongly typed [SectionEntity].
   SectionEntity _parseSection(Map<String, dynamic> map) {
     final templateName = map['template_name'];
     if (templateName == null || templateName is! String) {
