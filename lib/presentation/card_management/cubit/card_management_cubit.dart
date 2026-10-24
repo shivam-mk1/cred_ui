@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/error/failures.dart';
@@ -11,17 +10,12 @@ class CardManagementCubit extends Cubit<CardManagementState> {
       : super(CardManagementState.initial());
 
   final FetchCardManagementUseCase _fetchUseCase;
-  CancelToken? _cancelToken;
 
   Future<void> load() async {
-    if (state.status == CardManagementStatus.loading) return;
-    _cancelToken?.cancel();
-    final token = CancelToken();
-    _cancelToken = token;
-
+    _fetchUseCase.cancel();
     emit(state.copyWith(status: CardManagementStatus.loading));
     try {
-      final sections = await _fetchUseCase(cancelToken: token);
+      final sections = await _fetchUseCase();
       final cards = sections.whereType<CardInstrumentSection>().toList();
       emit(state.copyWith(
         status: CardManagementStatus.loaded,
@@ -29,23 +23,14 @@ class CardManagementCubit extends Cubit<CardManagementState> {
         cards: cards,
         clearError: true,
       ));
+    } on CancelledFailure {
+      // Request was cancelled; emit NO error state
+      return;
     } on AppFailure catch (failure) {
       emit(state.copyWith(
         status: CardManagementStatus.error,
         failure: failure,
         errorMessage: failure.message,
-      ));
-    } on DioException catch (e) {
-      if (CancelToken.isCancel(e) || e.type == DioExceptionType.cancel) {
-        return;
-      }
-      if (kDebugMode) {
-        debugPrint('[CardManagementCubit] Unhandled DioException: ${e.type}');
-      }
-      emit(state.copyWith(
-        status: CardManagementStatus.error,
-        failure: const UnknownFailure(),
-        errorMessage: const UnknownFailure().message,
       ));
     } catch (e) {
       if (kDebugMode) {
@@ -65,7 +50,7 @@ class CardManagementCubit extends Cubit<CardManagementState> {
 
   @override
   Future<void> close() {
-    _cancelToken?.cancel();
+    _fetchUseCase.cancel();
     return super.close();
   }
 }

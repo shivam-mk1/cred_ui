@@ -185,31 +185,13 @@ void main() {
       );
     });
 
-    test('rethrows DioException directly when type is cancel', () async {
-      final dio = Dio();
-      dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.reject(
-              DioException(
-                requestOptions: requestOptions,
-                type: DioExceptionType.cancel,
-              ),
-            );
-          },
+    test('maps cancel to CancelledFailure', () async {
+      await assertMapping(
+        errorToThrow: DioException(
+          requestOptions: requestOptions,
+          type: DioExceptionType.cancel,
         ),
-      );
-
-      final datasource = CardManagementRemoteDatasource(dio);
-      final repository = CardManagementRepositoryImpl(datasource);
-
-      expect(
-        () => repository.fetchSections(),
-        throwsA(isA<DioException>().having(
-          (e) => e.type,
-          'type',
-          DioExceptionType.cancel,
-        )),
+        expectedFailureType: CancelledFailure,
       );
     });
 

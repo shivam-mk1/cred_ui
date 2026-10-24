@@ -11,22 +11,24 @@ import '../../domain/repositories/card_management_repository.dart';
 import '../datasources/card_management_remote_datasource.dart';
 
 class CardManagementRepositoryImpl implements CardManagementRepository {
-  const CardManagementRepositoryImpl(this._datasource);
+  CardManagementRepositoryImpl(this._datasource);
 
   final CardManagementRemoteDatasource _datasource;
+  CancelToken? _cancelToken;
 
   @override
-  Future<List<SectionEntity>> fetchSections({CancelToken? cancelToken}) async {
+  Future<List<SectionEntity>> fetchSections() async {
+    _cancelToken?.cancel();
+    final token = CancelToken();
+    _cancelToken = token;
+
     try {
-      final raw = await _datasource.fetchRaw(cancelToken: cancelToken);
+      final raw = await _datasource.fetchRaw(cancelToken: token);
       final items = raw['items'] as List<dynamic>? ?? [];
       return items
           .map((e) => _parseSection(e as Map<String, dynamic>? ?? {}))
           .toList();
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.cancel || CancelToken.isCancel(e)) {
-        rethrow;
-      }
       throw _mapDioException(e);
     } on FormatException catch (e) {
       if (kDebugMode) {
@@ -48,7 +50,16 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
     }
   }
 
+  @override
+  void cancel() {
+    _cancelToken?.cancel();
+  }
+
   AppFailure _mapDioException(DioException e) {
+    if (e.type == DioExceptionType.cancel || CancelToken.isCancel(e)) {
+      return const CancelledFailure();
+    }
+
     final statusCode = e.response?.statusCode;
     if (statusCode == 429) {
       return const RateLimitFailure();
@@ -58,6 +69,8 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
     }
 
     switch (e.type) {
+      case DioExceptionType.cancel:
+        return const CancelledFailure();
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
@@ -76,8 +89,6 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
           debugPrint('[CardManagementRepository] HTTP client error: $statusCode');
         }
         return const UnknownFailure();
-      case DioExceptionType.cancel:
-        return const UnknownFailure('Request was cancelled');
       case DioExceptionType.badCertificate:
         if (kDebugMode) {
           debugPrint('[CardManagementRepository] Bad certificate error');

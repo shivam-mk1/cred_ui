@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cred_assignment/core/error/failures.dart';
@@ -17,18 +16,45 @@ class _FailingRepository implements CardManagementRepository {
   final AppFailure failure;
 
   @override
-  Future<List<SectionEntity>> fetchSections({CancelToken? cancelToken}) async {
+  Future<List<SectionEntity>> fetchSections() async {
     throw failure;
   }
+
+  @override
+  void cancel() {}
 }
 
 class _CancellingRepository implements CardManagementRepository {
   @override
-  Future<List<SectionEntity>> fetchSections({CancelToken? cancelToken}) async {
-    throw DioException(
-      requestOptions: RequestOptions(path: 'https://api.mocklets.com/p87/card-management'),
-      type: DioExceptionType.cancel,
-    );
+  Future<List<SectionEntity>> fetchSections() async {
+    throw const CancelledFailure();
+  }
+
+  @override
+  void cancel() {}
+}
+
+class _SequentialRepository implements CardManagementRepository {
+  int callCount = 0;
+  bool firstCancelled = false;
+
+  @override
+  Future<List<SectionEntity>> fetchSections() async {
+    callCount++;
+    if (callCount == 1) {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      if (firstCancelled) {
+        throw const CancelledFailure();
+      }
+      return [];
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  void cancel() {
+    firstCancelled = true;
   }
 }
 
@@ -132,13 +158,32 @@ void main() {
 
       expect(cubit.state.status, CardManagementStatus.initial);
 
-      // Trigger load which throws DioExceptionType.cancel
+      // Trigger load which throws CancelledFailure
       await cubit.load();
 
       // State must not transition to error
       expect(cubit.state.status, isNot(CardManagementStatus.error));
       expect(cubit.state.failure, isNull);
       expect(cubit.state.errorMessage, isNull);
+    });
+
+    test('two load() calls in quick succession end in success, never stuck on loading', () async {
+      final repository = _SequentialRepository();
+      final useCase = FetchCardManagementUseCase(repository);
+      final cubit = CardManagementCubit(useCase);
+
+      expect(cubit.state.status, CardManagementStatus.initial);
+
+      // Trigger two load calls in quick succession
+      final firstLoad = cubit.load();
+      final secondLoad = cubit.load();
+
+      await Future.wait([firstLoad, secondLoad]);
+
+      // Must end in loaded, NEVER stuck on loading
+      expect(cubit.state.status, CardManagementStatus.loaded);
+      expect(repository.callCount, 2);
+      expect(repository.firstCancelled, true);
     });
   });
 }

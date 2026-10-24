@@ -39,6 +39,12 @@ final class ParseFailure extends AppFailure {
   ]);
 }
 
+final class CancelledFailure extends AppFailure {
+  const CancelledFailure([
+    super.message = 'Request was cancelled.',
+  ]);
+}
+
 final class UnknownFailure extends AppFailure {
   const UnknownFailure([
     super.message = 'An unexpected error occurred. Please try again.',
