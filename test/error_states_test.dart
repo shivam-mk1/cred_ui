@@ -83,6 +83,7 @@ void main() {
     );
   }
 
+  // Protects typed error UI presentation, retry button disablement, and unhandled cancel exceptions.
   group('Error & Offline State Verification (Requirement 8)', () {
     testWidgets('renders NoInternet UI and no card data when offline', (tester) async {
       await tester.pumpWidget(buildScreenWithFailure(const NoInternetFailure()));

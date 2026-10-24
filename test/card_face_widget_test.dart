@@ -10,6 +10,7 @@ import 'package:cred_assignment/presentation/card_management/widgets/card/cred_c
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // Protects card face layout from render overflows on narrow (360px) viewport boundaries.
   late CardInstrumentEntity sampleCard;
 
   setUp(() async {

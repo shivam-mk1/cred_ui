@@ -56,6 +56,7 @@ void main() {
     }
   });
 
+  // Protects isolation of empty state rendering exclusively to loaded states with 0 cards.
   group('Empty State Verification', () {
     testWidgets('EmptyStateWidget renders message and empty icon', (tester) async {
       await tester.pumpWidget(

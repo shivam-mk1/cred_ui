@@ -10,6 +10,7 @@ import 'package:cred_assignment/presentation/card_management/cubit/card_manageme
 import 'package:cred_assignment/presentation/card_management/cubit/card_management_state.dart';
 
 void main() {
+  // Protects HTTP exception mapping to typed domain failures, cancel token pooling, and strict schema validation.
   group('CardManagementRepositoryImpl - DioException to AppFailure Mapping', () {
     Future<void> assertMapping({
       required DioException errorToThrow,
