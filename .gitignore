@@ -55,3 +55,6 @@ web/
 .metadata
 analysis_options.yaml
 devtools_options.yaml
+*.jpeg
+*.jpg
+*.png

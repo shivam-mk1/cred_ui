@@ -203,7 +203,7 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
                   final double cardWidth = math.max(0.0, viewportWidth - 32.0);
                   final double cardBodyHeight = cardWidth / 1.586;
                   final double effectiveCardHeight =
-                      widget.cardHeight ?? (cardBodyHeight + 46.0);
+                      widget.cardHeight ?? (cardBodyHeight + 64.0);
 
                   // Compute max scroll extent for list mode
                   final double totalListHeight = (widget.cards.length *
@@ -271,7 +271,7 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
                       fit: StackFit.expand,
                       clipBehavior: Clip.hardEdge,
                       children: [
-                        _buildQuickActions(cardBodyHeight),
+                        _buildQuickActions(effectiveCardHeight),
                         AnimatedBuilder(
                           animation: Listenable.merge([
                             _deckToListAnimation,
@@ -308,19 +308,18 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
     );
   }
 
-  Widget _buildQuickActions(double cardBodyHeight) {
+  Widget _buildQuickActions(double panelHeight) {
     final double revealProgress =
         (_horizontalDragX.abs() / kMaxLeftSlide.abs()).clamp(0.0, 1.0);
 
-    // The quick-action panel sits to the right of the swiped card.
-    // Width matches the exposed gap when fully swiped (kMaxLeftSlide.abs()).
-    final double panelWidth = kMaxLeftSlide.abs() - 8;
+    // Wider than the raw swipe gap so items spread out and shift left naturally.
+    final double panelWidth = kMaxLeftSlide.abs() + 40;
 
     return Positioned(
       top: 40,
       right: 0,
       width: panelWidth,
-      height: cardBodyHeight,
+      height: panelHeight,
       child: IgnorePointer(
         ignoring: !_isLatchedOpen,
         child: Opacity(
@@ -405,7 +404,7 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
       if (i == 0 && tDeck < 0.5) {
         final dragFraction =
             (_horizontalDragX.abs() / kMaxLeftSlide.abs()).clamp(0.0, 1.0);
-        final angleY = -dragFraction * (math.pi / 10.0);
+        final angleY = -dragFraction * (math.pi / 8.0);
 
         transformMatrix = Matrix4.identity()
           ..setEntry(3, 2, 0.001)
@@ -573,20 +572,22 @@ class _DefaultActionGrid extends StatelessWidget {
       rows.add(_items.sublist(i, (i + 2).clamp(0, _items.length)));
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: rows.map((row) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: row
-              .map(
-                (item) => Expanded(
-                  child: _ActionChip(icon: item.icon, label: item.label),
-                ),
-              )
-              .toList(),
-        );
-      }).toList(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: rows.map((row) {
+          return Row(
+            children: row
+                .map(
+                  (item) => Expanded(
+                    child: _ActionChip(icon: item.icon, label: item.label),
+                  ),
+                )
+                .toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
@@ -621,15 +622,20 @@ class _ActionChip extends StatelessWidget {
           child: Icon(icon, size: 18, color: Colors.black87),
         ),
         const SizedBox(height: 5),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: Colors.black54,
+        // Fixed width gives the text a bounded constraint so it wraps to 2 lines.
+        SizedBox(
+          width: 56,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            softWrap: true,
           ),
-          textAlign: TextAlign.center,
-          maxLines: 2,
         ),
       ],
     );

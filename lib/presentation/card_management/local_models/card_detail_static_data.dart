@@ -33,17 +33,20 @@ abstract final class CardDetailStaticData {
   static const String detailSectionDate = 'SEPTEMBER 7TH';
 
   static const List<ActionGridItem> actionGridItems = [
-    ActionGridItem(icon: Icons.check_circle_outline_rounded, label: 'mark as paid'),
+    ActionGridItem(
+        icon: Icons.check_circle_outline_rounded, label: 'mark as paid'),
     ActionGridItem(icon: Icons.description_outlined, label: 'smart statement'),
     ActionGridItem(icon: Icons.history_rounded, label: 'payment history'),
     ActionGridItem(icon: Icons.local_offer_outlined, label: 'card offers'),
-    ActionGridItem(icon: Icons.account_balance_wallet_outlined, label: 'recent spends'),
+    ActionGridItem(
+        icon: Icons.account_balance_wallet_outlined, label: 'recent spends'),
     ActionGridItem(icon: Icons.more_horiz_rounded, label: 'more actions'),
   ];
 
   // Top-row quick actions shown in the detail panel header.
   static const List<ActionGridItem> panelQuickActions = [
-    ActionGridItem(icon: Icons.check_circle_outline_rounded, label: 'mark as paid'),
+    ActionGridItem(
+        icon: Icons.check_circle_outline_rounded, label: 'mark as paid'),
     ActionGridItem(icon: Icons.history_rounded, label: 'payment history'),
   ];
 
