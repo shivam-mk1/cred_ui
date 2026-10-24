@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
+/// An interactive list row in the card detail panel featuring an icon, title, and subtitle.
 class DetailRowWidget extends StatelessWidget {
   const DetailRowWidget({
     super.key,

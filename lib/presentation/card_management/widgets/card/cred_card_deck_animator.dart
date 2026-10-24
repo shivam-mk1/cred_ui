@@ -5,6 +5,8 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
+/// Interactive 3D deck animator supporting scrollable card peeling, horizontal
+/// swipe-to-reveal quick action drawers, and vertical slide-up detail sheets.
 class CredCardDeckAnimator extends StatefulWidget {
   final List<Widget> cards;
   final double? cardHeight;

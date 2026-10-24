@@ -3,6 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../cubit/card_management_state.dart';
 
+/// Segmented toggle button switching between Total Due and Recent Spends modes.
 class TabToggleWidget extends StatelessWidget {
   const TabToggleWidget({
     super.key,

@@ -16,7 +16,7 @@ typedef TemplateBuilder = Widget Function(
 /// Registry for Server-Driven UI sections.
 /// Maps sealed [SectionEntity] variants to widget builders.
 /// Unknown templates are safely skipped with [UnknownTemplate].
-/// Recursive [child_list] items are routed through this same registry.
+/// Recursive child list items are routed through this same registry.
 class TemplateRegistry {
   TemplateRegistry({
     required this.ctaDispatcher,

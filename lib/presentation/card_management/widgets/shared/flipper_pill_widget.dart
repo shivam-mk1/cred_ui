@@ -5,6 +5,7 @@ import '../../../../domain/entities/flipper_pill_entity.dart';
 import 'format_text_widget.dart';
 import 'server_image_widget.dart';
 
+/// Displays a pill badge with status information or pending action callouts.
 class FlipperPillWidget extends StatelessWidget {
   const FlipperPillWidget({
     super.key,

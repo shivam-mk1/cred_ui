@@ -6,6 +6,8 @@ import '../shared/server_image_widget.dart';
 import '../shared/flipper_pill_widget.dart';
 import 'card_pose.dart';
 
+/// Renders the visual representation of a credit card face with bank branding,
+/// masked card numbers, statement due overlays, and status pills.
 class CardFaceWidget extends StatelessWidget {
   const CardFaceWidget({
     super.key,

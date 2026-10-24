@@ -18,9 +18,11 @@ import '../widgets/states/error_state_widget.dart';
 import '../widgets/states/loading_state_widget.dart';
 import '../widgets/templates/template_registry.dart';
 
+/// Top-level screen widget providing the [CardManagementCubit] and hosting the animated deck.
 class CardAnimationScreen extends StatelessWidget {
   const CardAnimationScreen({super.key, this.cubit});
 
+  /// Optional test-injected cubit instance. If null, resolves from [sl].
   final CardManagementCubit? cubit;
 
   @override

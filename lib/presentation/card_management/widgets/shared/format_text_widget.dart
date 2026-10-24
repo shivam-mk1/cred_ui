@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import '../../../../core/utils/format_string_parser.dart';
 
+/// Renders formatted text strings containing server-side markup tags.
 class FormatTextWidget extends StatelessWidget {
   const FormatTextWidget({
     super.key,
