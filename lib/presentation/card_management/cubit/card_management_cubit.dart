@@ -41,8 +41,8 @@ class CardManagementCubit extends Cubit<CardManagementState> {
       }
       emit(state.copyWith(
         status: CardManagementStatus.error,
-        failure: UnknownFailure(e.toString()),
-        errorMessage: e.toString(),
+        failure: const UnknownFailure(),
+        errorMessage: const UnknownFailure().message,
       ));
     }
   }

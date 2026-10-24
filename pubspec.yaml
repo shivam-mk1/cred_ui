@@ -16,7 +16,6 @@ dependencies:
   dio: ^5.7.0
   pretty_dio_logger: ^1.4.0
   cached_network_image: ^3.4.1
-  flutter_svg: ^2.0.10
 
 dev_dependencies:
   flutter_test:

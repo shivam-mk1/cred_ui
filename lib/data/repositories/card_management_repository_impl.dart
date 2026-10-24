@@ -31,7 +31,7 @@ class CardManagementRepositoryImpl implements CardManagementRepository {
     } on AppFailure {
       rethrow;
     } catch (e) {
-      throw UnknownFailure(e.toString());
+      throw const UnknownFailure();
     }
   }
 
