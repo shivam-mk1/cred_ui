@@ -1,11 +1,14 @@
-/// System-wide constants and fallback labels for the Card Management feature.
+/// System-wide fallback copy and constant labels for card management.
+///
+/// These tokens represent safe presentation defaults rendered when the backend
+/// response omits optional header or section label fields.
 abstract final class CardManagementConstants {
-  /// Default label for total due tab and header when not customized by the server.
+  /// Default label for the total due tab toggle when omitted by the server.
   static const String totalDueLabel = 'TOTAL DUE';
 
-  /// Default label for recent spends tab and header when not customized by the server.
+  /// Default label for the recent spends tab toggle when omitted by the server.
   static const String recentSpendsLabel = 'RECENT SPENDS';
 
-  /// Fallback header title for the detail panel when statement date/title is absent.
+  /// Fallback header title for the detail sheet when card statement date is absent.
   static const String cardDetailsFallbackTitle = 'CARD DETAILS';
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Parses backend formatted strings containing `<text fgClr="#hex">text</text>` tags into [TextSpan]s.
+///
+/// Strips optional surrounding `<format>` and `</format>` wrappers.
+/// Returns an empty list when [raw] is null or empty.
 List<TextSpan> parseFormatString(String? raw, {TextStyle? defaultStyle}) {
   if (raw == null || raw.isEmpty) return const [];
 
@@ -35,7 +39,9 @@ List<TextSpan> parseFormatString(String? raw, {TextStyle? defaultStyle}) {
   return spans.isEmpty ? [TextSpan(text: stripped, style: defaultStyle)] : spans;
 }
 
-/// Returns the plain-text content of a format string (all tags stripped).
+/// Returns the plain-text content of a format string with all XML-like tags stripped.
+///
+/// Useful for accessibility labels and semantic descriptions where tags should not be read.
 String stripFormatTags(String? raw) {
   if (raw == null || raw.isEmpty) return '';
   return _stripOuter(raw)

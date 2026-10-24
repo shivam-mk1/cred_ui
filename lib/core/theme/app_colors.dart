@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Design system color tokens for the CRED card management experience.
+///
+/// Defines color roles for backgrounds, text emphasis, cards, and states.
 abstract final class AppColors {
   // Backgrounds
   static const Color screenBg = Color(0xFFF2F1EC);

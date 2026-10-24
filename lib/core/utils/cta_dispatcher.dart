@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/cta_entity.dart';
 
+/// Routes user actions triggered by CTA models to target flows or deeplinks.
 abstract interface class CtaDispatcher {
+  /// Dispatches the appropriate interaction for [cta].
+  ///
+  /// Safe to call with null [cta]; no action is executed in that case.
   void dispatch(BuildContext context, CtaEntity? cta);
 }
 
+/// Standard production implementation of [CtaDispatcher].
+///
+/// Handles external URLs via deeplinks and dialog flows defined by the server.
 class CtaDispatcherImpl implements CtaDispatcher {
   const CtaDispatcherImpl();
 

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
+/// Typography tokens for card management layouts and templates.
+///
+/// Encapsulates font sizes, weights, line heights, and letter spacing matching
+/// CRED design specifications.
 abstract final class AppTextStyles {
   // Top bar
   static const TextStyle topBarAmount = TextStyle(
