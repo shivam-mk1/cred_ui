@@ -17,6 +17,11 @@ class CredCardDeckAnimator extends StatefulWidget {
   final Widget? quickActions;
 
   final Widget? detailsSheet;
+  final Widget Function(
+    BuildContext context,
+    int selectedIndex,
+    VoidCallback onClose,
+  )? detailsSheetBuilder;
 
   const CredCardDeckAnimator({
     super.key,
@@ -27,6 +32,7 @@ class CredCardDeckAnimator extends StatefulWidget {
     this.header,
     this.quickActions,
     this.detailsSheet,
+    this.detailsSheetBuilder,
   });
 
   @override
@@ -168,118 +174,137 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return Column(
-      children: [
-        if (widget.header != null) widget.header!,
-        Expanded(
-          child: ClipRect(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final double viewportHeight = constraints.maxHeight;
-                final double viewportWidth = constraints.maxWidth;
-                final double cardWidth = math.max(0.0, viewportWidth - 32.0);
-                final double cardBodyHeight = cardWidth / 1.586;
-                final double effectiveCardHeight =
-                    widget.cardHeight ?? (cardBodyHeight + 46.0);
+    return AnimatedBuilder(
+      animation: _expandDetailsController,
+      builder: (context, child) {
+        final bool isDetailOpen = _expandDetailsController.value > 0 ||
+            _expandDetailsController.isAnimating;
 
-                // Compute max scroll extent for list mode
-                final double totalListHeight = (widget.cards.length *
-                        (effectiveCardHeight + widget.cardSpacing)) -
-                    widget.cardSpacing +
-                    24.0;
-                _maxScroll = math.max(0.0, totalListHeight - viewportHeight);
+        return PopScope(
+          canPop: !isDetailOpen,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            if (isDetailOpen) {
+              _expandDetailsController.reverse();
+            }
+          },
+          child: child!,
+        );
+      },
+      child: Column(
+        children: [
+          if (widget.header != null) widget.header!,
+          Expanded(
+            child: ClipRect(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final double viewportHeight = constraints.maxHeight;
+                  final double viewportWidth = constraints.maxWidth;
+                  final double cardWidth = math.max(0.0, viewportWidth - 32.0);
+                  final double cardBodyHeight = cardWidth / 1.586;
+                  final double effectiveCardHeight =
+                      widget.cardHeight ?? (cardBodyHeight + 46.0);
 
-                return GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onVerticalDragStart: (details) {
-                    if (_expandDetailsController.value > 0) return;
-                    _flingController.stop();
-                    _dragStartedAtTop = (_scrollOffset <= 0.5);
-                    _cumulativeVerticalDrag = 0.0;
-                  },
-                  onVerticalDragUpdate: (details) {
-                    if (_expandDetailsController.value > 0 ||
-                        _deckToListController.isAnimating ||
-                        _isLatchedOpen) {
-                      return;
-                    }
+                  // Compute max scroll extent for list mode
+                  final double totalListHeight = (widget.cards.length *
+                          (effectiveCardHeight + widget.cardSpacing)) -
+                      widget.cardSpacing +
+                      24.0;
+                  _maxScroll = math.max(0.0, totalListHeight - viewportHeight);
 
-                    _cumulativeVerticalDrag += details.delta.dy;
-
-                    if (!_isListExpanded) return;
-
-                    final double newOffset = _scrollOffset - details.delta.dy;
-                    if (newOffset >= 0.0) {
-                      setState(() {
-                        _scrollOffset = newOffset.clamp(0.0, _maxScroll);
-                      });
-                    } else {
-                      setState(() {
-                        _scrollOffset = 0.0;
-                      });
-                    }
-                  },
-                  onVerticalDragEnd: (details) {
-                    if (_expandDetailsController.value > 0 ||
-                        _deckToListController.isAnimating ||
-                        _isLatchedOpen) {
-                      return;
-                    }
-
-                    final double velocity = details.primaryVelocity ?? 0.0;
-
-                    if (!_isListExpanded) {
-                      // Swipe up → expand into list
-                      if (velocity < -180 || _cumulativeVerticalDrag < -40) {
-                        _expandToList();
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onVerticalDragStart: (details) {
+                      if (_expandDetailsController.value > 0) return;
+                      _flingController.stop();
+                      _dragStartedAtTop = (_scrollOffset <= 0.5);
+                      _cumulativeVerticalDrag = 0.0;
+                    },
+                    onVerticalDragUpdate: (details) {
+                      if (_expandDetailsController.value > 0 ||
+                          _deckToListController.isAnimating ||
+                          _isLatchedOpen) {
+                        return;
                       }
-                    } else {
-                      // Double swipe-down guard: only collapse when at top
-                      if (_dragStartedAtTop &&
-                          _scrollOffset <= 0.5 &&
-                          (velocity > 180 || _cumulativeVerticalDrag > 40)) {
-                        _collapseToDeck();
+
+                      _cumulativeVerticalDrag += details.delta.dy;
+
+                      if (!_isListExpanded) return;
+
+                      final double newOffset = _scrollOffset - details.delta.dy;
+                      if (newOffset >= 0.0) {
+                        setState(() {
+                          _scrollOffset = newOffset.clamp(0.0, _maxScroll);
+                        });
                       } else {
-                        _performFling(velocity);
+                        setState(() {
+                          _scrollOffset = 0.0;
+                        });
                       }
-                    }
-                  },
-                  child: Stack(
-                    fit: StackFit.expand,
-                    clipBehavior: Clip.hardEdge,
-                    children: [
-                      _buildQuickActions(cardBodyHeight),
-                      AnimatedBuilder(
-                        animation: Listenable.merge([
-                          _deckToListAnimation,
-                          _expandDetailsAnimation,
-                        ]),
-                        builder: (context, child) {
-                          final double tDeck = _deckToListAnimation.value;
-                          final double tExpand = _expandDetailsAnimation.value;
+                    },
+                    onVerticalDragEnd: (details) {
+                      if (_expandDetailsController.value > 0 ||
+                          _deckToListController.isAnimating ||
+                          _isLatchedOpen) {
+                        return;
+                      }
 
-                          return Stack(
-                            fit: StackFit.expand,
-                            clipBehavior: Clip.none,
-                            children: _buildCards(
-                              viewportHeight,
-                              viewportWidth,
-                              effectiveCardHeight,
-                              tDeck,
-                              tExpand,
-                            ),
-                          );
-                        },
-                      ),
-                      _buildModalSheet(size),
-                    ],
-                  ),
-                );
-              },
+                      final double velocity = details.primaryVelocity ?? 0.0;
+
+                      if (!_isListExpanded) {
+                        // Swipe up → expand into list
+                        if (velocity < -180 || _cumulativeVerticalDrag < -40) {
+                          _expandToList();
+                        }
+                      } else {
+                        // Double swipe-down guard: only collapse when at top
+                        if (_dragStartedAtTop &&
+                            _scrollOffset <= 0.5 &&
+                            (velocity > 180 || _cumulativeVerticalDrag > 40)) {
+                          _collapseToDeck();
+                        } else {
+                          _performFling(velocity);
+                        }
+                      }
+                    },
+                    child: Stack(
+                      fit: StackFit.expand,
+                      clipBehavior: Clip.hardEdge,
+                      children: [
+                        _buildQuickActions(cardBodyHeight),
+                        AnimatedBuilder(
+                          animation: Listenable.merge([
+                            _deckToListAnimation,
+                            _expandDetailsAnimation,
+                          ]),
+                          builder: (context, child) {
+                            final double tDeck = _deckToListAnimation.value;
+                            final double tExpand =
+                                _expandDetailsAnimation.value;
+
+                            return Stack(
+                              fit: StackFit.expand,
+                              clipBehavior: Clip.none,
+                              children: _buildCards(
+                                viewportHeight,
+                                viewportWidth,
+                                effectiveCardHeight,
+                                tDeck,
+                                tExpand,
+                              ),
+                            );
+                          },
+                        ),
+                        _buildModalSheet(size, viewportHeight),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -287,64 +312,26 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
     final double revealProgress =
         (_horizontalDragX.abs() / kMaxLeftSlide.abs()).clamp(0.0, 1.0);
 
+    // The quick-action panel sits to the right of the swiped card.
+    // Width matches the exposed gap when fully swiped (kMaxLeftSlide.abs()).
+    final double panelWidth = kMaxLeftSlide.abs() - 8;
+
     return Positioned(
-      top: 10,
-      right: 20,
-      width: 105,
+      top: 40,
+      right: 0,
+      width: panelWidth,
       height: cardBodyHeight,
       child: IgnorePointer(
         ignoring: !_isLatchedOpen,
         child: Opacity(
           opacity: revealProgress,
           child: Transform.scale(
-            scale: 0.8 + (0.2 * revealProgress),
+            scale: 0.85 + (0.15 * revealProgress),
             alignment: Alignment.centerRight,
-            child: widget.quickActions ??
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildDefaultActionChip(
-                        Icons.check_circle_outline, 'Mark paid'),
-                    _buildDefaultActionChip(Icons.receipt_long, 'Statement'),
-                    _buildDefaultActionChip(Icons.history, 'History'),
-                  ],
-                ),
+            child: widget.quickActions ?? const _DefaultActionGrid(),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDefaultActionChip(IconData icon, String label) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: Colors.black54,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Icon(icon, size: 18, color: Colors.black87),
-        ),
-      ],
     );
   }
 
@@ -358,41 +345,67 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
     final List<Widget> widgets = [];
     final int count = widget.cards.length;
 
-    if (count == 0) return widgets;
-    final double stackPeekBase = viewportHeight - 110.0;
-    for (int i = count - 1; i >= 0; i--) {
-      double deckY;
-      double deckScale;
+    // Front card of the bottom deck (Card index 1) sits ~115px above viewport bottom
+    final double frontCardY = viewportHeight - 115.0;
 
-      if (i == 0) {
-        deckY = 0.0;
-        deckScale = 1.0;
+    // Pre-calculate resting Deck coordinates and scales
+    final List<double> deckY = List<double>.filled(count, 0.0);
+    final List<double> deckScale = List<double>.filled(count, 1.0);
+
+    // Card 0 (Active card at top)
+    deckY[0] = 40.0;
+    deckScale[0] = 1.0;
+
+    // Bottom stack cards (Card 1, 2, 3...)
+    for (int i = 1; i < count; i++) {
+      if (i == 1) {
+        // Front-most card of the bottom stack
+        deckY[i] = frontCardY;
+        deckScale[i] = 1.0;
+      } else if (i == 2) {
+        // Immediately behind Card 1: peeks 46px above Card 1 so header & logo are visible
+        deckY[i] = frontCardY - 46.0;
+        deckScale[i] = 0.94;
       } else {
-        final int rank = i - 1;
-        deckY = stackPeekBase + (rank * 10.0).clamp(0.0, 30.0);
-        deckScale = 1.0 - (rank * 0.025).clamp(0.0, 0.08);
+        // Cards further back peek an additional 22px higher each, with smaller scale
+        deckY[i] = frontCardY - 46.0 - ((i - 2) * 22.0);
+        deckScale[i] = math.max(0.80, 0.94 - ((i - 2) * 0.05));
       }
+    }
 
+    // Paint from deepest bottom card (count - 1) down to Card 1, then Card 0 on top
+    final List<int> paintOrder = [];
+    for (int i = count - 1; i >= 1; i--) {
+      paintOrder.add(i);
+    }
+    paintOrder.add(0);
+
+    for (final int i in paintOrder) {
+      // List Mode coordinates (sequential linear list)
       final double listY = i * (effectiveCardHeight + widget.cardSpacing);
       const double listScale = 1.0;
 
-      final double interpolatedY = lerpDouble(deckY, listY, tDeck)!;
-      final double interpolatedScale = lerpDouble(deckScale, listScale, tDeck)!;
+      // Smooth GPU interpolation from Deck to List
+      final double interpolatedY = lerpDouble(deckY[i], listY, tDeck)!;
+      final double interpolatedScale =
+          lerpDouble(deckScale[i], listScale, tDeck)!;
       double currentY = interpolatedY - (tDeck == 1.0 ? _scrollOffset : 0.0);
+
+      // Modal Expand adjustment
       if (tExpand > 0) {
         if (i == _selectedCardIndex) {
           currentY = currentY - (currentY * tExpand);
         } else {
-          // All other cards exit downward
           currentY += (viewportHeight * 0.5) * tExpand;
         }
       }
 
+      // Horizontal 3D Perspective Matrix (Active top card in deck mode)
       Matrix4 transformMatrix = Matrix4.identity();
-      if (i == 0 && tDeck < 0.5 && tExpand == 0) {
-        final double dragFraction =
+      if (i == 0 && tDeck < 0.5) {
+        final dragFraction =
             (_horizontalDragX.abs() / kMaxLeftSlide.abs()).clamp(0.0, 1.0);
-        final double angleY = -dragFraction * (math.pi / 10.0);
+        final angleY = -dragFraction * (math.pi / 10.0);
 
         transformMatrix = Matrix4.identity()
           ..setEntry(3, 2, 0.001)
@@ -400,78 +413,80 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
           ..rotateY(angleY);
       }
 
-      final bool isActiveCard = i == 0;
-      final bool canSwipeHorizontal =
-          isActiveCard && tDeck < 0.5 && tExpand == 0;
-
-      widgets.add(
-        Positioned(
+      widgets.add(Positioned(
           top: 0,
           left: 16,
           right: 16,
+          height: effectiveCardHeight,
           child: Transform.translate(
             offset: Offset(0, currentY),
             child: Transform.scale(
               scale: interpolatedScale,
               alignment: Alignment.topCenter,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onHorizontalDragUpdate: canSwipeHorizontal
-                    ? (details) {
+              child: IgnorePointer(
+                ignoring: tExpand > 0,
+                child: Opacity(
+                  opacity: (1.0 - tExpand).clamp(0.0, 1.0),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onHorizontalDragUpdate:
+                        (i == 0 && tDeck < 0.5 && tExpand == 0)
+                            ? (details) {
+                                setState(() {
+                                  _horizontalDragX =
+                                      (_horizontalDragX + details.delta.dx)
+                                          .clamp(kMaxLeftSlide, 0.0);
+                                });
+                              }
+                            : null,
+                    onHorizontalDragEnd: (i == 0 && tDeck < 0.5 && tExpand == 0)
+                        ? (details) {
+                            final v = details.primaryVelocity ?? 0.0;
+                            if (!_isLatchedOpen) {
+                              if (_horizontalDragX < kMaxLeftSlide * 0.35 ||
+                                  v < -250) {
+                                _animateHorizontalTo(kMaxLeftSlide);
+                              } else {
+                                _animateHorizontalTo(0.0);
+                              }
+                            } else {
+                              if (_horizontalDragX > kMaxLeftSlide * 0.65 ||
+                                  v > 250) {
+                                _animateHorizontalTo(0.0);
+                              } else {
+                                _animateHorizontalTo(kMaxLeftSlide);
+                              }
+                            }
+                          }
+                        : null,
+                    onTap: () {
+                      if (_isLatchedOpen) {
+                        _closeHorizontalSlide();
+                      } else if (tExpand == 0) {
                         setState(() {
-                          _horizontalDragX =
-                              (_horizontalDragX + details.delta.dx)
-                                  .clamp(kMaxLeftSlide, 0.0);
+                          _selectedCardIndex = i;
                         });
+                        _expandDetailsController.forward();
                       }
-                    : null,
-                onHorizontalDragEnd: canSwipeHorizontal
-                    ? (details) {
-                        final double v = details.primaryVelocity ?? 0.0;
-                        if (!_isLatchedOpen) {
-                          if (_horizontalDragX < kMaxLeftSlide * 0.35 ||
-                              v < -250) {
-                            _animateHorizontalTo(kMaxLeftSlide);
-                          } else {
-                            _animateHorizontalTo(0.0);
-                          }
-                        } else {
-                          if (_horizontalDragX > kMaxLeftSlide * 0.65 ||
-                              v > 250) {
-                            _animateHorizontalTo(0.0);
-                          } else {
-                            _animateHorizontalTo(kMaxLeftSlide);
-                          }
-                        }
-                      }
-                    : null,
-                onTap: () {
-                  if (_isLatchedOpen) {
-                    _closeHorizontalSlide();
-                  } else if (tExpand == 0 &&
-                      !_expandDetailsController.isAnimating) {
-                    setState(() => _selectedCardIndex = i);
-                    _expandDetailsController.forward();
-                  }
-                },
-                child: Transform(
-                  alignment: Alignment.centerLeft,
-                  transform: transformMatrix,
-                  child: RepaintBoundary(
-                    child: widget.cards[i],
+                    },
+                    child: Transform(
+                      alignment: Alignment.centerLeft,
+                      transform: transformMatrix,
+                      child: RepaintBoundary(
+                        child: widget.cards[i],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      );
+          )));
     }
 
     return widgets;
   }
 
-  Widget _buildModalSheet(Size size) {
+  Widget _buildModalSheet(Size size, double viewportHeight) {
     return AnimatedBuilder(
       animation: _expandDetailsAnimation,
       builder: (context, child) {
@@ -480,17 +495,37 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
           return const SizedBox.shrink();
         }
 
-        final double sheetHeight = size.height * 0.60;
+        final double sheetHeight = math.min(viewportHeight, size.height * 0.88);
+        void closeAction() => _expandDetailsController.reverse();
+
+        final Widget sheetWidget;
+        if (widget.detailsSheetBuilder != null) {
+          sheetWidget = widget.detailsSheetBuilder!(
+            context,
+            _selectedCardIndex,
+            closeAction,
+          );
+        } else if (widget.detailsSheet != null) {
+          sheetWidget = widget.detailsSheet!;
+        } else {
+          sheetWidget = _DefaultDetailsSheet(
+            selectedIndex: _selectedCardIndex,
+            onDismiss: closeAction,
+          );
+        }
 
         return Stack(
           children: [
+            // Darkened backdrop scrim: tapping closes the detail view
             GestureDetector(
-              onTap: () => _expandDetailsController.reverse(),
+              behavior: HitTestBehavior.opaque,
+              onTap: closeAction,
               child: Container(
                 color: Colors.black
-                    .withOpacity((0.45 * progress).clamp(0.0, 0.45)),
+                    .withOpacity((0.55 * progress).clamp(0.0, 0.55)),
               ),
             ),
+            // Sliding modal sheet with drag down to dismiss
             Positioned(
               left: 0,
               right: 0,
@@ -498,10 +533,15 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
               height: sheetHeight,
               child: Transform.translate(
                 offset: Offset(0, (1.0 - progress) * sheetHeight),
-                child: widget.detailsSheet ??
-                    _DefaultDetailsSheet(
-                      onDismiss: () => _expandDetailsController.reverse(),
-                    ),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onVerticalDragEnd: (details) {
+                    if ((details.primaryVelocity ?? 0.0) > 200) {
+                      closeAction();
+                    }
+                  },
+                  child: sheetWidget,
+                ),
               ),
             ),
           ],
@@ -511,9 +551,98 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
   }
 }
 
-class _DefaultDetailsSheet extends StatelessWidget {
-  const _DefaultDetailsSheet({required this.onDismiss});
+/// A 2-column × 3-row grid of action chips that fills its parent's height
+/// using spaceEvenly — no fixed childAspectRatio, no clipping.
+class _DefaultActionGrid extends StatelessWidget {
+  static const _items = [
+    (icon: Icons.check_circle_outline, label: 'mark as paid'),
+    (icon: Icons.summarize_outlined, label: 'smart statement'),
+    (icon: Icons.history, label: 'payment history'),
+    (icon: Icons.percent_outlined, label: 'card offers'),
+    (icon: Icons.receipt_long, label: 'recent spends'),
+    (icon: Icons.more_horiz_sharp, label: 'more actions'),
+  ];
 
+  const _DefaultActionGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    // Build rows of 2
+    final rows = <List<({IconData icon, String label})>>[];
+    for (int i = 0; i < _items.length; i += 2) {
+      rows.add(_items.sublist(i, (i + 2).clamp(0, _items.length)));
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: rows.map((row) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: row
+              .map(
+                (item) => Expanded(
+                  child: _ActionChip(icon: item.icon, label: item.label),
+                ),
+              )
+              .toList(),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _ActionChip extends StatelessWidget {
+  const _ActionChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(icon, size: 18, color: Colors.black87),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: Colors.black54,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+        ),
+      ],
+    );
+  }
+}
+
+class _DefaultDetailsSheet extends StatelessWidget {
+  const _DefaultDetailsSheet({
+    this.selectedIndex = 0,
+    required this.onDismiss,
+  });
+
+  final int selectedIndex;
   final VoidCallback onDismiss;
 
   @override
@@ -530,24 +659,45 @@ class _DefaultDetailsSheet extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag handle
-          Center(
-            child: Container(
-              width: 44,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+          // Header with drag handle and close button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(width: 32),
+              Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
+              GestureDetector(
+                onTap: onDismiss,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
-          const Text(
-            'STATEMENT DETAILS',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          Text(
+            'CARD ${selectedIndex + 1} DETAILS',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          const Text('₹50,000.00 bill generated on 28 Aug'),
+          Text('Viewing statement details for card #${selectedIndex + 1}'),
           const Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'cta_entity.dart';
 import 'asset_entity.dart';
+import 'statement_info_data.dart';
+
+export 'statement_info_data.dart';
 
 class StatementSummaryEntity extends Equatable {
   const StatementSummaryEntity({
@@ -89,6 +92,8 @@ class StatementInfoEntity extends Equatable {
   final CtaEntity? cta2;
 
   final AssetEntity? asset1;
+
+  StatementInfoData get data => StatementInfoData.fromEntity(this);
 
   static StatementInfoEntity fromMap(Map<String, dynamic>? map) {
     if (map == null) return const StatementInfoEntity();

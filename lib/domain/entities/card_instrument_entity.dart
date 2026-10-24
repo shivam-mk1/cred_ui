@@ -82,6 +82,26 @@ class CardInstrumentEntity extends Equatable {
   /// Sorted by priority ascending on parse
   final List<FlipperPillEntity> flipperPill;
 
+  /// Extracts bank name from mini-card asset url (e.g. "AXIS BANK MINI CARD.png" -> "AXIS BANK")
+  /// or falls back to provider / credit card.
+  String get bankName {
+    if (asset3?.url != null && asset3!.url!.isNotEmpty) {
+      final uri = Uri.tryParse(asset3!.url!);
+      if (uri != null && uri.pathSegments.isNotEmpty) {
+        final last = Uri.decodeComponent(uri.pathSegments.last);
+        final clean = last
+            .replaceAll(RegExp(r'\s*MINI\s*CARD.*', caseSensitive: false), '')
+            .replaceAll(RegExp(r'\.png$|\.jpg$|\.webp$', caseSensitive: false), '')
+            .trim();
+        if (clean.isNotEmpty) return clean;
+      }
+    }
+    if (provider != null && provider!.isNotEmpty) {
+      return provider!;
+    }
+    return 'CREDIT CARD';
+  }
+
   static CardInstrumentEntity fromMap(Map<String, dynamic>? map) {
     if (map == null) return const CardInstrumentEntity();
 

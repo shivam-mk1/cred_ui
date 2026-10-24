@@ -9,16 +9,20 @@ class TabToggleWidget extends StatelessWidget {
     required this.active,
     required this.dueCount,
     required this.onToggle,
+    this.totalDueLabel = 'TOTAL DUE',
+    this.recentSpendsLabel = 'RECENT SPENDS',
   });
 
   final ActiveToggle active;
-  final int dueCount;
+  final int? dueCount;
   final ValueChanged<ActiveToggle> onToggle;
+  final String totalDueLabel;
+  final String recentSpendsLabel;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(3),
+      padding: const EdgeInsets.all(3),
       height: 36,
       decoration: BoxDecoration(
         color: const Color(0xFFE8E7E2),
@@ -39,7 +43,7 @@ class TabToggleWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: AppColors.surfaceCard,
                       borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
+                      boxShadow: const [
                     BoxShadow(
                         color: Color(0x14000000),
                         blurRadius: 4,
@@ -50,13 +54,13 @@ class TabToggleWidget extends StatelessWidget {
           Row(
             children: [
               _Tab(
-                label: 'TOTAL DUE',
+                label: totalDueLabel,
                 isActive: active == ActiveToggle.totalDue,
                 badgeCount: dueCount,
                 onTap: () => onToggle(ActiveToggle.totalDue),
               ),
               _Tab(
-                label: 'RECENT SPENDS',
+                label: recentSpendsLabel,
                 isActive: active == ActiveToggle.recentSpends,
                 onTap: () => onToggle(ActiveToggle.recentSpends),
               ),
@@ -78,11 +82,13 @@ class _Tab extends StatelessWidget {
 
   final String label;
   final bool isActive;
-  final int badgeCount;
+  final int? badgeCount;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final bool showBadge = badgeCount != null && badgeCount! > 0;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -103,20 +109,20 @@ class _Tab extends StatelessWidget {
                     ? AppTextStyles.tabActive
                     : AppTextStyles.tabInactive,
               ),
-              if (badgeCount > 0) ...[
+              if (showBadge) ...[
                 const SizedBox(width: 4),
                 Container(
                   width: 15,
                   height: 15,
-                  padding: EdgeInsets.all(1),
+                  padding: const EdgeInsets.all(1),
                   decoration: const BoxDecoration(
                     color: AppColors.pillAlertRed,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Text(
-                      badgeCount.toString(),
-                      style: TextStyle(color: Colors.white, fontSize: 10),
+                      '$badgeCount',
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),
                 ),

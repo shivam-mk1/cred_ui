@@ -34,37 +34,49 @@ class CardDetailLayout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // ── Card + 6-item Action Grid row ──────────────────────────────────
-        SizedBox(
-          height: 240,
-          child: Stack(
-            children: [
-              // Card shifted left
-              Positioned(
-                left: -145,
-                top: 0,
-                width: MediaQuery.of(context).size.width - 32,
-                child: RepaintBoundary(
-                  child: CardFaceWidget(
-                    card: activeCard,
-                    pose: const CardPose(offset: Offset.zero),
-                    showStatementOverlay: true,
-                    showPill: false,
-                    onPayNowTap: onPayNowTap,
-                    onCardTap: onCardTap,
-                  ),
-                ),
-              ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Reserve ~48% of available width for the action grid
+            final totalWidth = constraints.maxWidth;
+            final gridWidth = totalWidth * 0.48;
+            final cardVisibleWidth = totalWidth - gridWidth;
+            // Card aspect ratio 1.586 → derive rendered height from visible width
+            const cardAspectRatio = 1.586;
+            final rowHeight = (cardVisibleWidth / cardAspectRatio) * 1.45;
 
-              // 6-item Action Grid on right
-              Positioned(
-                right: 16,
-                top: 0,
-                bottom: 0,
-                width: 175,
-                child: const _ActionGrid(),
+            return SizedBox(
+              height: rowHeight,
+              child: Stack(
+                children: [
+                  // Card: bleeds left off-screen; only right portion is visible
+                  Positioned(
+                    left: -(totalWidth - cardVisibleWidth - 32),
+                    top: 0,
+                    width: totalWidth - 32,
+                    child: RepaintBoundary(
+                      child: CardFaceWidget(
+                        card: activeCard,
+                        pose: const CardPose(offset: Offset.zero),
+                        showStatementOverlay: true,
+                        showPill: false,
+                        onPayNowTap: onPayNowTap,
+                        onCardTap: onCardTap,
+                      ),
+                    ),
+                  ),
+
+                  // 6-item Action Grid — right-aligned, fills full row height
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: gridWidth,
+                    child: const _ActionGrid(),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
 
         const SizedBox(height: 18),
@@ -87,20 +99,25 @@ class _ActionGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = CardDetailStaticData.actionGridItems;
+    // Split into rows of 2
+    final rows = <List<ActionGridItem>>[];
+    for (int i = 0; i < items.length; i += 2) {
+      rows.add(items.sublist(i, (i + 2).clamp(0, items.length)));
+    }
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
-      padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 14,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.85,
-      ),
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return _ActionGridItemWidget(item: item);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: rows.map((rowItems) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: rowItems
+                  .map((item) => Expanded(child: _ActionGridItemWidget(item: item)))
+                  .toList(),
+            );
+          }).toList(),
+        );
       },
     );
   }
@@ -117,6 +134,8 @@ class _ActionGridItemWidget extends StatelessWidget {
       onTap: item.onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: 44,

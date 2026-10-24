@@ -91,15 +91,21 @@ class StatementInfoTemplate extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       RichText(
-                          text: TextSpan(
-                              style: AppTextStyles.statementAmount,
-                              children: [
+                        text: TextSpan(
+                          style: AppTextStyles.statementAmount,
+                          children: [
                             TextSpan(
-                                text: amountParts?[0],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            TextSpan(text: '.${amountParts?[1]}')
-                          ])),
+                              text: amountParts != null && amountParts.isNotEmpty
+                                  ? amountParts[0]
+                                  : amount,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            if (amountParts != null && amountParts.length > 1)
+                              TextSpan(text: '.${amountParts[1]}'),
+                          ],
+                        ),
+                      ),
                       const SizedBox(width: 4),
                       const Icon(
                         Icons.keyboard_arrow_down_rounded,
