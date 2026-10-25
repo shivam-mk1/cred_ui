@@ -473,6 +473,14 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
                                 }
                               : null,
                       onTap: () {
+                        // Single tap ONLY closes the horizontal 3D swipe if it
+                        // is latched open.
+                        if (_isLatchedOpen) {
+                          _closeHorizontalSlide();
+                        }
+                      },
+                      onLongPress: () {
+                        // Detailed view modal opens ONLY on long press.
                         if (_isLatchedOpen) {
                           _closeHorizontalSlide();
                         } else if (tExpand == 0) {

@@ -249,8 +249,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Tap card 0 to open detail
-      await tester.tap(find.byKey(const ValueKey('card_0')));
+      // Long press card 0 to open detail
+      await tester.longPress(find.byKey(const ValueKey('card_0')));
       await tester.pumpAndSettle();
 
       expect(tappedIndex, 0);
