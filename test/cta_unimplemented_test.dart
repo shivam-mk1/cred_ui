@@ -145,7 +145,8 @@ void main() {
       final markAsPaidFinder = find.text('mark as paid');
       final paymentHistoryFinder = find.text('payment history');
 
-      // Tap mark as paid, then immediately tap payment history without waiting for dismiss
+      // Tap mark as paid, then immediately tap payment history without waiting
+      // for dismiss.
       await tester.tap(markAsPaidFinder);
       await tester.pump();
       await tester.tap(paymentHistoryFinder);

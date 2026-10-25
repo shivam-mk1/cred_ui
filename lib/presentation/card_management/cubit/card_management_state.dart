@@ -16,6 +16,7 @@ class CardManagementState extends Equatable {
     this.cards = const [],
     this.activeToggle = ActiveToggle.totalDue,
     this.failure,
+    this.isRefreshing = false,
   });
 
   /// The current state machine lifecycle status.
@@ -33,6 +34,9 @@ class CardManagementState extends Equatable {
   /// Present when [status] is [CardManagementStatus.error], otherwise null.
   final AppFailure? failure;
 
+  /// Whether a background pull-to-refresh operation is actively running.
+  final bool isRefreshing;
+
   factory CardManagementState.initial() => const CardManagementState();
 
   CardManagementState copyWith({
@@ -42,6 +46,7 @@ class CardManagementState extends Equatable {
     ActiveToggle? activeToggle,
     AppFailure? failure,
     bool clearError = false,
+    bool? isRefreshing,
   }) {
     return CardManagementState(
       status: status ?? this.status,
@@ -49,6 +54,7 @@ class CardManagementState extends Equatable {
       cards: cards ?? this.cards,
       activeToggle: activeToggle ?? this.activeToggle,
       failure: clearError ? null : (failure ?? this.failure),
+      isRefreshing: isRefreshing ?? this.isRefreshing,
     );
   }
 
@@ -59,5 +65,6 @@ class CardManagementState extends Equatable {
         cards,
         activeToggle,
         failure,
+        isRefreshing,
       ];
 }

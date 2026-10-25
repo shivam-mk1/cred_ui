@@ -49,7 +49,22 @@ class _CardAnimationView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F1EC), // AppColors.screenBg
       body: SafeArea(
-        child: BlocBuilder<CardManagementCubit, CardManagementState>(
+        child: BlocConsumer<CardManagementCubit, CardManagementState>(
+          listener: (context, state) {
+            // Present background refresh failure via a floating SnackBar while
+            // preserving existing card deck content.
+            if (state.status == CardManagementStatus.loaded &&
+                state.failure != null) {
+              final messenger = ScaffoldMessenger.of(context);
+              messenger.hideCurrentSnackBar();
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(state.failure!.message),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
           builder: (context, state) {
             return switch (state.status) {
               CardManagementStatus.initial => const LoadingStateWidget(),
@@ -60,10 +75,25 @@ class _CardAnimationView extends StatelessWidget {
                       onRetry: () => context.read<CardManagementCubit>().load(),
                     )
                   : const LoadingStateWidget(),
-              CardManagementStatus.error => ErrorStateWidget(
-                  failure: state.failure ?? const UnknownFailure(),
-                  isLoading: false,
-                  onRetry: () => context.read<CardManagementCubit>().load(),
+              // Pull-to-refresh is enabled on error state using scrollable
+              // physics without conflicting with custom deck gesture arenas.
+              CardManagementStatus.error => LayoutBuilder(
+                  builder: (context, constraints) => RefreshIndicator(
+                    onRefresh: () =>
+                        context.read<CardManagementCubit>().refresh(),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: constraints.maxHeight,
+                        child: ErrorStateWidget(
+                          failure: state.failure ?? const UnknownFailure(),
+                          isLoading: false,
+                          onRetry: () =>
+                              context.read<CardManagementCubit>().load(),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               CardManagementStatus.loaded => _buildLoaded(context, state),
             };
@@ -112,9 +142,23 @@ class _CardAnimationView extends StatelessWidget {
       return Column(
         children: [
           header,
-          const Expanded(
-            child: EmptyStateWidget(
-              message: 'No cards available',
+          // Pull-to-refresh is enabled on empty state using scrollable physics
+          // without conflicting with custom deck gesture arenas.
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) => RefreshIndicator(
+                onRefresh: () =>
+                    context.read<CardManagementCubit>().refresh(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: SizedBox(
+                    height: constraints.maxHeight,
+                    child: const EmptyStateWidget(
+                      message: 'No cards available',
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
