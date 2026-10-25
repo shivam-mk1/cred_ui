@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/card_management_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/utils/cta_dispatcher.dart';
 import '../../../../domain/entities/card_instrument_entity.dart';
 import '../../models/detail_panel_row.dart';
 import '../card/card_face_widget.dart';
@@ -50,6 +51,10 @@ class CardDetailPanel extends StatelessWidget {
         icon: Icons.description_outlined,
         title: 'latest statement',
         subtitle: statementSubtitle,
+        onTap: () => CtaDispatcherImpl.showUnimplemented(
+          context,
+          'latest statement',
+        ),
       ),
       DetailPanelRow(
         icon: Icons.credit_card_rounded,
@@ -57,12 +62,20 @@ class CardDetailPanel extends StatelessWidget {
         subtitle: card.text3 != null && card.text3!.isNotEmpty
             ? 'card number ${card.text3}'
             : 'active credit card',
+        onTap: () => CtaDispatcherImpl.showUnimplemented(
+          context,
+          card.bankName,
+        ),
       ),
       if (pendingActionPill != null)
         DetailPanelRow(
           icon: Icons.notification_important_outlined,
           title: 'pending actions',
           subtitle: pendingSubtitle,
+          onTap: () => CtaDispatcherImpl.showUnimplemented(
+            context,
+            'pending actions',
+          ),
         ),
     ];
 
@@ -143,7 +156,10 @@ class CardDetailPanel extends StatelessWidget {
                       child: _QuickActionButton(
                         icon: Icons.check_circle_outline_rounded,
                         label: 'mark as paid',
-                        onTap: () {},
+                        onTap: () => CtaDispatcherImpl.showUnimplemented(
+                          context,
+                          'mark as paid',
+                        ),
                       ),
                     ),
                     Container(
@@ -155,7 +171,10 @@ class CardDetailPanel extends StatelessWidget {
                       child: _QuickActionButton(
                         icon: Icons.description_outlined,
                         label: 'payment history',
-                        onTap: () {},
+                        onTap: () => CtaDispatcherImpl.showUnimplemented(
+                          context,
+                          'payment history',
+                        ),
                       ),
                     ),
                   ],

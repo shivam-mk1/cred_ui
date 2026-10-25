@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/utils/cta_dispatcher.dart';
 import '../../../../domain/entities/card_instrument_entity.dart';
 import '../shared/server_image_widget.dart';
 import '../shared/flipper_pill_widget.dart';
@@ -159,7 +160,11 @@ class _CardBody extends StatelessWidget {
                             card.statement!.cta1!.title!.isNotEmpty)
                           _PayNowButton(
                             label: card.statement!.cta1!.title!,
-                            onTap: onPayNowTap,
+                            onTap: onPayNowTap ??
+                                () => CtaDispatcherImpl.showUnimplemented(
+                                      context,
+                                      card.statement!.cta1!.title,
+                                    ),
                           ),
                       ],
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/cta_entity.dart';
+import 'format_string_parser.dart';
 
 /// Routes user actions triggered by CTA models to target flows or deeplinks.
 abstract interface class CtaDispatcher {
@@ -7,6 +8,10 @@ abstract interface class CtaDispatcher {
   ///
   /// Safe to call with null [cta]; no action is executed in that case.
   void dispatch(BuildContext context, CtaEntity? cta);
+
+  /// Displays floating feedback that the requested CTA or action is
+  /// intentionally unimplemented in this demo.
+  void notifyUnimplemented(BuildContext context, [String? actionName]);
 }
 
 /// Standard production implementation of [CtaDispatcher].
@@ -15,31 +20,59 @@ abstract interface class CtaDispatcher {
 class CtaDispatcherImpl implements CtaDispatcher {
   const CtaDispatcherImpl();
 
+  // CTAs such as external payment flows, deep links, and secondary card
+  // management actions are intentionally unimplemented per assignment scope.
+  /// Displays a floating SnackBar informing the user that an action is
+  /// intentionally unimplemented per the assignment scope.
+  static void showUnimplemented(BuildContext context, [String? actionName]) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+
+    final formattedName = _formatActionName(actionName);
+    final text = formattedName != null
+        ? '$formattedName is not available in this demo'
+        : 'Not available in this demo';
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(text),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  static String? _formatActionName(String? raw) {
+    if (raw == null) return null;
+    final cleaned = stripFormatTags(raw).trim();
+    if (cleaned.isEmpty || cleaned.contains('₹')) return null;
+    return cleaned[0].toUpperCase() + cleaned.substring(1);
+  }
+
+  @override
+  void notifyUnimplemented(BuildContext context, [String? actionName]) {
+    showUnimplemented(context, actionName);
+  }
+
   @override
   void dispatch(BuildContext context, CtaEntity? cta) {
     if (cta == null) return;
     switch (cta.type) {
       case CtaType.deeplink:
-        _handleDeeplink(context, cta.deeplink?.url);
+        notifyUnimplemented(context, cta.title);
       case CtaType.flow:
-        _handleFlow(context, cta.flow?.type);
+        _handleFlow(context, cta);
       case CtaType.unknown:
-        return;
+        notifyUnimplemented(context, cta.title);
     }
   }
 
-  void _handleDeeplink(BuildContext context, String? url) {
-    if (url == null || url.isEmpty) return;
-    _showFeedback(context, 'Deeplink: $url');
-  }
-
-  void _handleFlow(BuildContext context, String? flowType) {
-    if (flowType == null || flowType.isEmpty) return;
-    switch (flowType) {
+  void _handleFlow(BuildContext context, CtaEntity cta) {
+    switch (cta.flow?.type) {
       case 'unbilled_statement_info_dialog':
         _showInfoDialog(context);
       default:
-        return;
+        notifyUnimplemented(context, cta.title);
     }
   }
 
@@ -58,12 +91,6 @@ class CtaDispatcherImpl implements CtaDispatcher {
           ),
         ],
       ),
-    );
-  }
-
-  void _showFeedback(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
     );
   }
 }

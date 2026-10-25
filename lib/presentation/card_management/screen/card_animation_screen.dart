@@ -127,6 +127,10 @@ class _CardAnimationView extends StatelessWidget {
         pose: CardPose.identity,
         showStatementOverlay: true,
         showPill: true,
+        onPayNowTap: () => ctaDispatcher.dispatch(
+          context,
+          section.body.statement?.cta1,
+        ),
       );
     }).toList();
 

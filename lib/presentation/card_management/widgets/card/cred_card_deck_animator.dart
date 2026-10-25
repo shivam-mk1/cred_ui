@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import '../../../../core/utils/cta_dispatcher.dart';
 
 /// Interactive 3D deck animator supporting scrollable card peeling, horizontal
 /// swipe-to-reveal quick action drawers, and vertical slide-up detail sheets.
@@ -151,6 +152,9 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
   }
 
   void _animateHorizontalTo(double target) {
+    setState(() {
+      _isLatchedOpen = (target == kMaxLeftSlide);
+    });
     final double start = _horizontalDragX;
     _horizontalSnapAnim = Tween<double>(begin: start, end: target).animate(
       CurvedAnimation(
@@ -163,9 +167,7 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
         });
       });
 
-    _horizontalSnapController.forward(from: 0.0).then((_) {
-      _isLatchedOpen = (target == kMaxLeftSlide);
-    });
+    _horizontalSnapController.forward(from: 0.0);
   }
 
   void _closeHorizontalSlide() {
@@ -432,51 +434,54 @@ class _CredCardDeckAnimatorState extends State<CredCardDeckAnimator>
                 ignoring: tExpand > 0,
                 child: Opacity(
                   opacity: (1.0 - tExpand).clamp(0.0, 1.0),
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onHorizontalDragUpdate:
-                        (i == 0 && tDeck < 0.5 && tExpand == 0)
-                            ? (details) {
-                                setState(() {
-                                  _horizontalDragX =
-                                      (_horizontalDragX + details.delta.dx)
-                                          .clamp(kMaxLeftSlide, 0.0);
-                                });
-                              }
-                            : null,
-                    onHorizontalDragEnd: (i == 0 && tDeck < 0.5 && tExpand == 0)
-                        ? (details) {
-                            final v = details.primaryVelocity ?? 0.0;
-                            if (!_isLatchedOpen) {
-                              if (_horizontalDragX < kMaxLeftSlide * 0.35 ||
-                                  v < -250) {
-                                _animateHorizontalTo(kMaxLeftSlide);
-                              } else {
-                                _animateHorizontalTo(0.0);
-                              }
-                            } else {
-                              if (_horizontalDragX > kMaxLeftSlide * 0.65 ||
-                                  v > 250) {
-                                _animateHorizontalTo(0.0);
-                              } else {
-                                _animateHorizontalTo(kMaxLeftSlide);
-                              }
-                            }
-                          }
-                        : null,
-                    onTap: () {
-                      if (_isLatchedOpen) {
-                        _closeHorizontalSlide();
-                      } else if (tExpand == 0) {
-                        setState(() {
-                          _selectedCardIndex = i;
-                        });
-                        _expandDetailsController.forward();
-                      }
-                    },
-                    child: Transform(
-                      alignment: Alignment.centerLeft,
-                      transform: transformMatrix,
+                  child: Transform(
+                    alignment: Alignment.centerLeft,
+                    transform: transformMatrix,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onHorizontalDragUpdate:
+                          (i == 0 && tDeck < 0.5 && tExpand == 0)
+                              ? (details) {
+                                  setState(() {
+                                    _horizontalDragX =
+                                        (_horizontalDragX + details.delta.dx)
+                                            .clamp(kMaxLeftSlide, 0.0);
+                                  });
+                                }
+                              : null,
+                      onHorizontalDragEnd:
+                          (i == 0 && tDeck < 0.5 && tExpand == 0)
+                              ? (details) {
+                                  final v = details.primaryVelocity ?? 0.0;
+                                  if (!_isLatchedOpen) {
+                                    if (_horizontalDragX <
+                                            kMaxLeftSlide * 0.35 ||
+                                        v < -250) {
+                                      _animateHorizontalTo(kMaxLeftSlide);
+                                    } else {
+                                      _animateHorizontalTo(0.0);
+                                    }
+                                  } else {
+                                    if (_horizontalDragX >
+                                            kMaxLeftSlide * 0.65 ||
+                                        v > 250) {
+                                      _animateHorizontalTo(0.0);
+                                    } else {
+                                      _animateHorizontalTo(kMaxLeftSlide);
+                                    }
+                                  }
+                                }
+                              : null,
+                      onTap: () {
+                        if (_isLatchedOpen) {
+                          _closeHorizontalSlide();
+                        } else if (tExpand == 0) {
+                          setState(() {
+                            _selectedCardIndex = i;
+                          });
+                          _expandDetailsController.forward();
+                        }
+                      },
                       child: RepaintBoundary(
                         child: widget.cards[i],
                       ),
@@ -592,7 +597,14 @@ class _DefaultActionGrid extends StatelessWidget {
             children: row
                 .map(
                   (item) => Expanded(
-                    child: _ActionChip(icon: item.icon, label: item.label),
+                    child: _ActionChip(
+                      icon: item.icon,
+                      label: item.label,
+                      onTap: () => CtaDispatcherImpl.showUnimplemented(
+                        context,
+                        item.label,
+                      ),
+                    ),
                   ),
                 )
                 .toList(),
@@ -604,52 +616,61 @@ class _DefaultActionGrid extends StatelessWidget {
 }
 
 class _ActionChip extends StatelessWidget {
-  const _ActionChip({required this.icon, required this.label});
+  const _ActionChip({
+    required this.icon,
+    required this.label,
+    this.onTap,
+  });
 
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Icon(icon, size: 18, color: Colors.black87),
-        ),
-        const SizedBox(height: 5),
-        // Fixed width gives the text a bounded constraint so it wraps to 2
-        // lines.
-        SizedBox(
-          width: 56,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: Colors.black54,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            softWrap: true,
+            child: Icon(icon, size: 18, color: Colors.black87),
           ),
-        ),
-      ],
+          const SizedBox(height: 5),
+          // Fixed width gives the text a bounded constraint so it wraps to 2
+          // lines.
+          SizedBox(
+            width: 56,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              softWrap: true,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
